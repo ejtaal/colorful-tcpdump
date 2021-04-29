@@ -57,7 +57,7 @@ Style: DIM, NORMAL, BRIGHT, RESET_ALL
 nice_colors = [
 Back.BLUE + Fore.GREEN,
 Back.BLUE + Fore.YELLOW,
-Back.BLUE + Fore.MAGENTA,
+#Back.BLUE + Fore.MAGENTA,
 Back.BLUE + Fore.CYAN,
 Back.BLUE + Fore.WHITE,
 Back.BLUE + Style.BRIGHT + Fore.RED,
@@ -77,7 +77,7 @@ Back.WHITE + Fore.MAGENTA,
 
 Back.YELLOW + Fore.RED,
 Back.YELLOW + Fore.BLUE,
-Back.YELLOW + Fore.MAGENTA,
+#Back.YELLOW + Fore.MAGENTA,
 #Back.YELLOW + Fore.CYAN,
 Back.YELLOW + Fore.WHITE,
 Back.YELLOW + Style.BRIGHT + Fore.WHITE,
@@ -170,25 +170,148 @@ port = r'(?:\d{1,5}|[a-z\d\-\.]+)'
 hexre = '[0-9a-f]'
 ipv6_grp = hexre+'{1,4}';
 ipv6_addr = '(?:::)?(?:'+ipv6_grp+'::?)+'+ipv6_grp+'(?:::)?'
+#ipv6_addr = '(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
+
+ipv6_addr = '(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
+#ipv6_addr = 
+
 proto = '[A-Z]{1,8}' # is 8 enough?
 #ipv6_rev = qr/(?:(?:$hex\.){31}$hex)/;
 #ipv6_addr = qr/(?:$ipv6_addr|$ipv6_rev)/;
 
+from pprint import pprint
 
+from geolite2 import geolite2
+reader = geolite2.reader()
+
+"""
+>>> from geolite2 import geolite2
+>>>
+>>> reader = geolite2.reader()
+>>> reader.get('1.1.1.1')
+{'country': ... }
+>>>
+>>> geolite2.close()
+#pprint(vars(object))
+"""
+
+ranges_info = {
+    'RFC1918': { 
+        '10.0.0.0/8': 'A',
+        '172.16.0.0/12': 'B',
+        '192.168.0.0/16': 'C'
+    }
+    'MCAST':
+    {
+        '224.0.0.1/32': 'hosts',
+        '224.0.0.2/32': 'routers',
+        '224.0.0.4/32': 'DVMRP',
+        '224.0.0.5/32': 'OSPF',
+        '224.0.0.6/32': 'OSPFDR',
+        '224.0.0.9/32': 'RIP2',
+        '224.0.0.10/32': 'EIGRP',
+        '224.0.0.13/32': 'PIM',
+        '224.0.0.18/32': 'VRRP',
+        '224.0.0.19/32': 'IS-ISoIP',
+        '224.0.0.20/32': 'IS-ISoIP',
+        '224.0.0.21/32': 'IS-ISoIP',
+        '224.0.0.22/32': 'IGMP',
+        '224.0.0.102/32': 'HSRPv2',
+        '224.0.0.107/32': 'PTP',
+        '224.0.0.251/32': 'mDNS',
+        '224.0.0.252/32': 'LLMNR',
+        '224.0.0.253/32': 'Teredo',
+        '224.0.1.1/32': 'NTP',
+        '224.0.1.22/32': 'SLP',
+        '224.0.1.35/32': 'SLP',
+        '224.0.1.39/32': 'CISCO-ANNOUNCE',
+        '224.0.1.40/32': 'CISCO-DISCOVER',
+        '224.0.1.41/32': 'H.323GK',
+        '224.0.1.128/30': 'PTP',
+        '239.255.255.250/32': 'SSD',
+        '239.255.255.253/32': 'SLP'
+    }
+}
+
+
+import ipaddress
+
+def get_ip_info( ip):
+    info = ''
+    geoip = reader.get( ip)
+    if geoip != None:
+        #pprint(geoip)
+        info += crc_colorize(geoip['country']['iso_code'])
+        if 'subdivisions' in geoip:
+            info += '/' + crc_colorize(geoip['subdivisions'][0]['iso_code'])
+
+    if info != "":
+        info = f'[{info}]'
+
+    for descr in ranges_info.keys():
+        moreinfo = ""
+        for r in ranges_info[ descr].keys():
+            #pprint( ra\)
+            if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):
+                if moreinfo == "":
+                    moreinfo = crc_colorize( descr)
+                moreinfo += '/' + crc_colorize( ranges_info[ descr][ r])
+
+    if moreinfo != "":
+        info += f'[{moreinfo}]'
+    
+
+
+
+
+    #  TODO : implement caching update and checking at the beginning
+    return info
+
+def colorize_match_ip( matchobj):
+    return crc_colorize( matchobj.group(1)) + get_ip_info(matchobj.group(1))
+
+def colorize_match_ip_port( matchobj):
+    print ( f'asked to colorize: {matchobj.group(0)}/{matchobj.group(1)}/{matchobj.group(2)}]' )
+    return crc_colorize( matchobj.group(1)) + ':' + crc_colorize( matchobj.group(2)) + get_ip_info(matchobj.group(1))
 
 def colorize_match( matchobj):
-    return crc_colorize( matchobj.group(0))
+    return crc_colorize( matchobj.group(1))
 
 def prettify_tcpdump_line_so_it_looks_nice( line):
-    #print( "old:  ", line)
+    print( "old:  ", line)
     for add in all_adds:
-        if re.search( ' > ' + add + '.' + port, line):
+        if re.search( ' > ' + add + f'(:|\.{port})', line):
             #print( "LOCAL on the right found")
             line = re.sub( '\s('+proto+')\s(.*) > (.*?):\s', ' \g<1> \g<3> < \g<2>: ', line)
 
-    line = re.sub( ipv4_addr, colorize_match, line)
-    line = re.sub( ' > ', Back.BLACK + Style.BRIGHT + Fore.RED + ' -> ' + Style.RESET_ALL, line)
-    line = re.sub( ' < ', Back.BLACK + Style.BRIGHT + Fore.BLUE + ' <- ' + Style.RESET_ALL, line)
+    for add in all_broadcasts:
+        if re.search( ' > ' + add + f'(:|\.{port})', line):
+            print( "BROADCAST found")
+            line = re.sub( f'^([0-9:\.]+\s{proto})\s({ipv4_addr})(\s|:|\.)', 
+                f' \g<1> {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}(({Style.RESET_ALL}'
+                + f'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
+                + '\g<3>', line)
+
+    #line = re.sub( ipv4_addr, colorize_match, line)
+    # Fix time, also so that it doesn't get recognised as ipv6 :D
+    line = re.sub( f'^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', ' \g<1>\g<2>\g<3>.\g<4>', line)
+
+
+    if re.search( ' IP .*: (?:tcp |UDP,)', line):
+        line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
+    elif re.search( ' IP6 .*: (?:tcp |UDP,)', line):
+        line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
+    elif re.search( ': ICMP ', line):
+        line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
+    elif re.search( ': ICMP6 ', line):
+        line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
+    elif re.search( ' Arp ', line):
+        line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
+    else:
+        line = re.sub( f'({ipv4_addr})', colorize_match, line)
+
+    line = re.sub( ' > ', Back.BLACK + Style.BRIGHT + Fore.RED  + ' > ' + Style.RESET_ALL, line)
+    line = re.sub( ' < ', Back.BLACK + Style.BRIGHT + Fore.BLUE + ' < ' + Style.RESET_ALL, line)
     print( "nice: ", line)
     
 
@@ -223,13 +346,16 @@ tout = threading.Thread(
 terr = threading.Thread(
     target=read_stderr, args=(process.stderr, [q.put]))
 twrite = threading.Thread(target=write_output, args=(q.get,))
+
 for t in (tout, terr, twrite):
     t.daemon = True
     t.start()
+
 process.wait()
+
 for t in (tout, terr):
     t.join()
+
 q.put(None)
-print(out)
-print(err)
+
 

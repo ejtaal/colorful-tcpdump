@@ -200,7 +200,7 @@ ranges_info = {
         '10.0.0.0/8': 'A',
         '172.16.0.0/12': 'B',
         '192.168.0.0/16': 'C'
-    }
+    },
     'MCAST':
     {
         '224.0.0.1/32': 'hosts',
@@ -229,12 +229,56 @@ ranges_info = {
         '224.0.1.41/32': 'H.323GK',
         '224.0.1.128/30': 'PTP',
         '239.255.255.250/32': 'SSD',
-        '239.255.255.253/32': 'SLP'
+        '239.255.255.253/32': 'SLP',
+        'ff02::1': 'hosts',
+        'ff02::2': 'routers',
+        'ff02::5': 'OSPF',
+        'ff02::6': 'OSPFDR',
+        'ff02::9': 'RIP2',
+        'ff02::a': 'EIGRP',
+        'ff02::d': 'PIM',
+        'ff02::12': 'VRRP',
+        'ff02::8': 'IS-ISoIP',
+        'ff02::16': 'MLDv2',
+        'ff02::1:2': 'DHCPv6',
+        'ff00::fb/128': 'mDNS',
+        'ff01::fb/128': 'mDNS',
+        'ff02::fb/128': 'mDNS',
+        'ff03::fb/128': 'mDNS',
+        'ff04::fb/128': 'mDNS',
+        'ff02::1:3': 'LLMNR',
+        'ff05::1:3': 'DHCP',
+        'ff00::101': 'NTP',
+        'ff01::101': 'NTP',
+        'ff02::101': 'NTP',
+        'ff03::101': 'NTP',
+        'ff00::181/128': 'PTP-MSG',
+        'ff01::181/128': 'PTP-MSG',
+        'ff02::181/128': 'PTP-MSG',
+        'ff03::181/128': 'PTP-MSG',
+        'ff02::6b/128': 'PTP-PD',
+        'ff00::c/128': 'SSDP',
+        'ff01::c/128': 'SSDP',
+        'ff02::c/128': 'SSDP',
+        'ff03::c/128': 'SSDP'
     }
 }
 
+# importing the module
+import json
+
+# Opening JSON file
+with open('data/ctd-data.json') as json_file:
+    data = json.load(json_file)
+    for key,value in data.items():
+        print(key)
+        ranges_info[ key] = data[ key]
+    pprint( ranges_info)
+
 
 import ipaddress
+
+
 
 def get_ip_info( ip):
     info = ''
@@ -250,35 +294,44 @@ def get_ip_info( ip):
 
     for descr in ranges_info.keys():
         moreinfo = ""
+        #print( 'descr: ', descr)
         for r in ranges_info[ descr].keys():
-            #pprint( ra\)
-            if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):
+            #pprint( r)
+            found=False
+            if ':' in ip and ':' in r:
+                if ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
+                    found=True
+            elif ':' not in ip and ':' not in r:
+                if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):
+                    found=True
+#            if ip.search('\.') and ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r)
+#            or ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
+                #print( 'ip is in net', ip, r)
+            if found:
                 if moreinfo == "":
                     moreinfo = crc_colorize( descr)
-                moreinfo += '/' + crc_colorize( ranges_info[ descr][ r])
-
-    if moreinfo != "":
-        info += f'[{moreinfo}]'
-    
-
-
-
+                if ranges_info[ descr][ r] != "":
+                    moreinfo += '/' + crc_colorize( ranges_info[ descr][ r])
+        if moreinfo != "":
+            info += f'[{moreinfo}]'
 
     #  TODO : implement caching update and checking at the beginning
-    return info
+    if info != "":
+        return " " + info
+    return ""
 
 def colorize_match_ip( matchobj):
     return crc_colorize( matchobj.group(1)) + get_ip_info(matchobj.group(1))
 
 def colorize_match_ip_port( matchobj):
-    print ( f'asked to colorize: {matchobj.group(0)}/{matchobj.group(1)}/{matchobj.group(2)}]' )
+    #print ( f'asked to colorize: {matchobj.group(0)}/{matchobj.group(1)}/{matchobj.group(2)}]' )
     return crc_colorize( matchobj.group(1)) + ':' + crc_colorize( matchobj.group(2)) + get_ip_info(matchobj.group(1))
 
 def colorize_match( matchobj):
     return crc_colorize( matchobj.group(1))
 
 def prettify_tcpdump_line_so_it_looks_nice( line):
-    print( "old:  ", line)
+    #print( "old:  ", line)
     for add in all_adds:
         if re.search( ' > ' + add + f'(:|\.{port})', line):
             #print( "LOCAL on the right found")
@@ -294,25 +347,40 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 
     #line = re.sub( ipv4_addr, colorize_match, line)
     # Fix time, also so that it doesn't get recognised as ipv6 :D
-    line = re.sub( f'^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', ' \g<1>\g<2>\g<3>.\g<4>', line)
+    # Also why does \d{2} not work in the second etc groupings?!?
+    line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', '\g<1>\g<2>\g<3>.\g<4> ', line)
+    #line = re.sub( '^(\d{2}):(\d+):\d', 'ABC', line)
 
 
     if re.search( ' IP .*: (?:tcp |UDP,)', line):
         line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
     elif re.search( ' IP6 .*: (?:tcp |UDP,)', line):
-        line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
+        line = re.sub( f'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
     elif re.search( ': ICMP ', line):
         line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
+        line = re.sub( '(ICMP echo request)', f'{Back.BLACK}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
+        line = re.sub( '(ICMP echo reply)', f'{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
+       
     elif re.search( ': ICMP6 ', line):
-        line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
-    elif re.search( ' Arp ', line):
-        line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
+        line = re.sub( f'({ipv6_addr})', colorize_match_ip, line)
+    elif re.search( ' ARP', line):
+        # ARP, Request who-has 172.30.253.88 (00:15:5d:0f:f3:ba) tell 172.30.240.1, length 28
+        line = re.sub( ', Request who-has (.*?) tell (.*?),', 
+                 f' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}(({Style.RESET_ALL}'
+                + f'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
+                + f' who-has \g<1>'
+            , line)
+        # ARP, Reply 172.30.253.88 is-at 00:15:5d:0f:f3:ba, length 28
+        line = re.sub( ', Reply (.*?) is-at (.*?),', f' \g<1> reply: \g<2>', line)
+        line = re.sub( f'({ipv4_addr})', colorize_match, line)
     else:
         line = re.sub( f'({ipv4_addr})', colorize_match, line)
 
     line = re.sub( ' > ', Back.BLACK + Style.BRIGHT + Fore.RED  + ' > ' + Style.RESET_ALL, line)
     line = re.sub( ' < ', Back.BLACK + Style.BRIGHT + Fore.BLUE + ' < ' + Style.RESET_ALL, line)
-    print( "nice: ", line)
+    #print( "nice: ", line)
+
+    print( line)
     
 
 def read_stderr(pipe, funcs):

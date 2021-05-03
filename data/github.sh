@@ -8,14 +8,14 @@ URL="https://api.github.com/meta"
 # wget -O "$SOURCE" "$URL"
 
 jq 'del(.[] | select(type!="array")) | to_entries | .[] as $line | $line.value[] as $v | [$v, $line.key] | @tsv' < github-ipranges.txt | \
-	sed -e 's/\\t/": "/' | \
+	sed -e 's/\\t/", "/' | \
 	sort -uV | \
 	tee /tmp/p
 
-echo -e '\t"GITHUB": {' | tee "$OUTPUT"
+echo -e '\t"GITHUB": [' | tee "$OUTPUT"
 awk 'BEGIN{
 	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
-	{print "\t" $0, ((last==FNR) ? "\n\t}\n" :",")}' /tmp/p | \
+	{print "\t[" $0 "]", ((last==FNR) ? "\n\t]\n" :",")}' /tmp/p | \
 		tee -a "$OUTPUT"
 
 #jq '.values[].properties | . as $line | .addressPrefixes[] as $a | [$a, $line.systemService] | @tsv' < azure-ipranges.txt | \

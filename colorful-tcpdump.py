@@ -22,6 +22,99 @@ for ifaceName in interfaces():
             if value[0]['broadcast'] not in all_broadcasts:
                 all_broadcasts.append( value[0]['broadcast'])
 
+ctd_logo = """
+   ,o888888o.       ,o888888o.     88888        ,o888888o.     8888888888o.   88888888888   88888      88 88888         
+  8888     `88.   .8888     `88.   88888      .8888     `88.   88888    `88.  88888         88888      88 88888         
+,88888       `8. ,88888       `8b  88888     ,88888       `8b  88888     `88  88888         88888      88 88888         
+888888           888888        `8b 88888     888888        `8b 88888     ,88  88888         88888      88 88888         
+888888           888888         88 88888     888888         88 88888.   ,88'  888888888     88888      88 88888         
+888888           888888         88 88888     888888         88 8888888888P'   88888         88888      88 88888         
+888888           888888        ,8P 88888     888888        ,8P 88888`8b       88888         88888      88 88888         
+`88888       .8' `88888       ,8P  88888     `88888       ,8P  88888 `8b.     88888         `8888     ,8P 88888         
+  8888     ,88'   `8888     ,88'   88888      `8888     ,88'   88888   `8b.   88888          8888   ,d8P  88888         
+   `8888888P'       `8888888P'     888888888888 `8888888P'     88888     `88. 88888           `Y88888P'   8888888888888 
+
+8888888888888888 ,o888888o.    8888888888o   8888888888o.      88888      88        ,8.       ,8.          8888888888o    
+      88888     8888     `88.  88888    `88. 88888    `^888.   88888      88       ,888.     ,888.         88888    `88.  
+      88888   ,88888       `8. 88888     `88 88888        `88. 88888      88      .`8888.   .`8888.        88888     `88  
+      88888   888888           88888     ,88 88888         `88 88888      88     ,8.`8888. ,8.`8888.       88888     ,88  
+      88888   888888           88888.   ,88' 88888          88 88888      88    ,8'8.`8888,8^8.`8888.      88888.   ,88'  
+      88888   888888           8888888888P'  88888          88 88888      88   ,8' `8.`8888' `8.`8888.     8888888888P'   
+      88888   888888           88888         88888         ,88 88888      88  ,8'   `8.`88'   `8.`8888.    88888          
+      88888   `88888       .8' 88888         88888        ,88' `8888     ,8P ,8'     `8.`'     `8.`8888.   88888          
+      88888     8888     ,88'  88888         88888    ,o88P'    8888   ,d8P ,8'       `8        `8.`8888.  88888          
+      88888      `8888888P'    88888         8888888888P'        `Y88888P' ,8'         `         `8.`8888. 88888
+"""
+
+"""
+ ::::::::   ::::::::  :::        ::::::::  :::::::::  :::::::::: :::    ::: :::        
+:+:    :+: :+:    :+: :+:       :+:    :+: :+:    :+: :+:        :+:    :+: :+:        
++:+        +:+    +:+ +:+       +:+    +:+ +:+    +:+ +:+        +:+    +:+ +:+        
++#+        +#+    +:+ +#+       +#+    +:+ +#++:++#:  :#::+::#   +#+    +:+ +#+        
++#+        +#+    +#+ +#+       +#+    +#+ +#+    +#+ +#+        +#+    +#+ +#+        
+#+#    #+# #+#    #+# #+#       #+#    #+# #+#    #+# #+#        #+#    #+# #+#        
+ ########   ########  ########## ########  ###    ### ###         ########  ########## 
+
+::::::::::: ::::::::  :::::::::  :::::::::  :::    ::: ::::    ::::  :::::::::         
+    :+:    :+:    :+: :+:    :+: :+:    :+: :+:    :+: +:+:+: :+:+:+ :+:    :+:        
+    +:+    +:+        +:+    +:+ +:+    +:+ +:+    +:+ +:+ +:+:+ +:+ +:+    +:+        
+    +#+    +#+        +#++:++#+  +#+    +:+ +#+    +:+ +#+  +:+  +#+ +#++:++#+         
+    +#+    +#+        +#+        +#+    +#+ +#+    +#+ +#+       +#+ +#+               
+    #+#    #+#    #+# #+#        #+#    #+# #+#    #+# #+#       #+# #+#               
+    ###     ########  ###        #########   ########  ###       ### ###   
+"""
+
+"""
+  sSSs    sSSs_sSSs    S.        sSSs_sSSs     .S_sSSs      sSSs   .S       S.   S.      
+ d%%SP   d%%SP~YS%%b   SS.      d%%SP~YS%%b   .SS~YS%%b    d%%SP  .SS       SS.  SS.     
+d%S'    d%S'     `S%b  S%S     d%S'     `S%b  S%S   `S%b  d%S'    S%S       S%S  S%S     
+S%S     S%S       S%S  S%S     S%S       S%S  S%S    S%S  S%S     S%S       S%S  S%S     
+S&S     S&S       S&S  S&S     S&S       S&S  S%S    d*S  S&S     S&S       S&S  S&S     
+S&S     S&S       S&S  S&S     S&S       S&S  S&S   .S*S  S&S_Ss  S&S       S&S  S&S     
+S&S     S&S       S&S  S&S     S&S       S&S  S&S_sdSSS   S&S~SP  S&S       S&S  S&S     
+S&S     S&S       S&S  S&S     S&S       S&S  S&S~YSY%b   S&S     S&S       S&S  S&S     
+S*b     S*b       d*S  S*b     S*b       d*S  S*S   `S%b  S*b     S*b       d*S  S*b     
+S*S.    S*S.     .S*S  S*S.    S*S.     .S*S  S*S    S%S  S*S     S*S.     .S*S  S*S.    
+ SSSbs   SSSbs_sdSSS    SSSbs   SSSbs_sdSSS   S*S    S&S  S*S      SSSbs_sdSSS    SSSbs  
+  YSSP    YSSP~YSSY      YSSP    YSSP~YSSY    S*S    SSS  S*S       YSSP~YSSY      YSSP  
+                                              SP          SP                             
+                                              Y           Y                              
+                                                                                         
+sdSS_SSSSSSbs    sSSs   .S_sSSs     .S_sSSs     .S       S.    .S_SsS_S.    .S_sSSs      
+YSSS~S%SSSSSP   d%%SP  .SS~YS%%b   .SS~YS%%b   .SS       SS.  .SS~S*S~SS.  .SS~YS%%b     
+     S%S       d%S'    S%S   `S%b  S%S   `S%b  S%S       S%S  S%S `Y' S%S  S%S   `S%b    
+     S%S       S%S     S%S    S%S  S%S    S%S  S%S       S%S  S%S     S%S  S%S    S%S    
+     S&S       S&S     S%S    d*S  S%S    S&S  S&S       S&S  S%S     S%S  S%S    d*S    
+     S&S       S&S     S&S   .S*S  S&S    S&S  S&S       S&S  S&S     S&S  S&S   .S*S    
+     S&S       S&S     S&S_sdSSS   S&S    S&S  S&S       S&S  S&S     S&S  S&S_sdSSS     
+     S&S       S&S     S&S~YSSY    S&S    S&S  S&S       S&S  S&S     S&S  S&S~YSSY      
+     S*S       S*b     S*S         S*S    d*S  S*b       d*S  S*S     S*S  S*S           
+     S*S       S*S.    S*S         S*S   .S*S  S*S.     .S*S  S*S     S*S  S*S           
+     S*S        SSSbs  S*S         S*S_sdSSS    SSSbs_sdSSS   S*S     S*S  S*S           
+     S*S         YSSP  S*S         SSS~YSSY      YSSP~YSSY    SSS     S*S  S*S           
+     SP                SP                                             SP   SP            
+     Y                 Y                                              Y    Y        
+"""
+
+"""
+________/\\\\\\\\\________________/\\\\\\_______________________________________/\\\\\________________/\\\\\\____        
+ _____/\\\////////________________\////\\\_____________________________________/\\\///________________\////\\\____       
+  ___/\\\/____________________________\/\\\____________________________________/\\\_______________________\/\\\____      
+   __/\\\_________________/\\\\\_______\/\\\________/\\\\\_____/\\/\\\\\\\___/\\\\\\\\\____/\\\____/\\\____\/\\\____     
+    _\/\\\_______________/\\\///\\\_____\/\\\______/\\\///\\\__\/\\\/////\\\_\////\\\//____\/\\\___\/\\\____\/\\\____    
+     _\//\\\_____________/\\\__\//\\\____\/\\\_____/\\\__\//\\\_\/\\\___\///_____\/\\\______\/\\\___\/\\\____\/\\\____   
+      __\///\\\__________\//\\\__/\\\_____\/\\\____\//\\\__/\\\__\/\\\____________\/\\\______\/\\\___\/\\\____\/\\\____  
+       ____\////\\\\\\\\\__\///\\\\\/____/\\\\\\\\\__\///\\\\\/___\/\\\____________\/\\\______\//\\\\\\\\\___/\\\\\\\\\_ 
+        _______\/////////_____\/////_____\/////////_____\/////_____\///_____________\///________\/////////___\/////////__
+___________________________________________________/\\\__________________________________________________                
+ __________________________________________________\/\\\__________________________________________________               
+  _____/\\\______________________/\\\\\\\\\_________\/\\\______________________________________/\\\\\\\\\__              
+   __/\\\\\\\\\\\_____/\\\\\\\\__/\\\/////\\\________\/\\\___/\\\____/\\\____/\\\\\__/\\\\\____/\\\/////\\\_             
+    _\////\\\////____/\\\//////__\/\\\\\\\\\\____/\\\\\\\\\__\/\\\___\/\\\__/\\\///\\\\\///\\\_\/\\\\\\\\\\__            
+     ____\/\\\_______/\\\_________\/\\\//////____/\\\////\\\__\/\\\___\/\\\_\/\\\_\//\\\__\/\\\_\/\\\//////___           
+      ____\/\\\_/\\__\//\\\________\/\\\_________\/\\\__\/\\\__\/\\\___\/\\\_\/\\\__\/\\\__\/\\\_\/\\\_________          
+       ____\//\\\\\____\///\\\\\\\\_\/\\\_________\//\\\\\\\/\\_\//\\\\\\\\\__\/\\\__\/\\\__\/\\\_\/\\\_________         
+        _____\/////_______\////////__\///___________\///////\//___\/////////___\///___\///___\///__\///__________      """
 """
    _____      _             __       _           
   / ____|    | |           / _|     | |          
@@ -37,6 +130,8 @@ for ifaceName in interfaces():
                                           | |    
                                           |_|    
 """
+
+
 
     #addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
     #print ( ifaceName, 'addr', [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_LINK, [{'addr':'No IP addr'}] )])
@@ -147,6 +242,8 @@ cmd = ['/sbin/tcpdump', '-lni', 'eth0']
 # TODO: add check for windows / windump / tshark?
 cmd = ['/sbin/tcpdump']
 cmd += sys.argv[1:]
+
+
 print( "tcpdump command to be executed: ", cmd)
 
 """
@@ -381,14 +478,26 @@ def store_dns_info( matchobj):
 def match_dns_info( matchobj):
     """
 02:33:56.598637 IP (1.1.1.1.53) > 172.30.253.88.(40418): (909) 1/0/0 A (189.113.174.199) (42)
+04:16:50.506404 IP 1.1.1.1.53 > 172.30.253.88.43389: 55004 2/0/0 CNAME HDRedirect-LB7-5a03e1c2772e1c9c.elb.us-east-1.amazonaws.com., A 3.223.115.185 (113)
+04:21:35.711426 IP 172.30.240.1.53 > 172.30.253.88.47204: 20303- 5/0/0 CNAME github.github.io., A 185.199.109.153, A 185.199.108.153, A 185.199.110.153, A 185.199.111.153 (158)
+04:32:36.555860 IP 172.30.240.1.53 > 172.30.253.88.51003: 5787- 6/0/0 A 74.6.231.21, A 74.6.143.25, A 74.6.231.20, A 98.137.11.164, A 98.137.11.163, A 74.6.143.26 (132)
     """
+    print("MARK")
     key = matchobj.group(2) + matchobj.group(1) + ': ' + matchobj.group(3)
     result = matchobj.group(4)
     #print( f'match_dns() key: [{key}] result: [{result}]')
     if key in dns_cache['queries']:
         domain = dns_cache['queries'][ key]
-        #print( f"GOT DNS MATCH: [{domain}] = [{result}]")
-        dns_cache['by_ip'][ result] = domain
+        print( f"GOT DNS MATCH: [{domain}] = [{result}]")
+        if re.search( ", A", result):
+            print(f"We got back multiple matches: {result}")
+            results = re.sub( ', A+ ', ',', result)
+            for r in results.split(','):
+                print(f"Storing: {r}")
+                dns_cache['by_ip'][ r] = domain
+        else:
+            # Looks to be a response with a single IP only
+            dns_cache['by_ip'][ result] = domain
         #pprint( dns_cache['by_ip'])
 
 
@@ -412,11 +521,19 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 02:28:21.105740 IP 172.30.253.88.53418 > 1.1.1.1.53: 18184+ A? blah.com. (26)
 02:28:21.177084 IP 172.30.253.88.40745 > 1.1.1.1.53: 25446+ AAAA? blah.com. (26)
         """
-        line = re.sub( '\.(\d+) > (.*?53: \d+).*?\? ([\w\.]+)\.', store_dns_info, line)
-        """
+    dns_query = re.search( '\.(\d+) > (.*?53: \d+).*?\? ([\w\.]+)\.', line)
+    if dns_query:
+        store_dns_info( dns_query)
+
+    """
 02:33:56.598637 IP 1.1.1.1.53 > 172.30.253.88.40418: 909 1/0/0 A 189.113.174.199 (42)
-        """
-        line = re.sub( 'IP6? (.*?.53) > .*?\.(\d+): (\d+) \d+\/\d+\/\d+ (?:A|AAAA) ([\w\.:]+) ', match_dns_info, line)
+04:16:50.506404 IP 1.1.1.1.53 > 172.30.253.88.43389: 55004 2/0/0 CNAME HDRedirect-LB7-5a03e1c2772e1c9c.elb.us-east-1.amazonaws.com., A 3.223.115.185 (113)
+04:21:35.711426 IP 172.30.240.1.53 > 172.30.253.88.47204: 20303- 5/0/0 CNAME github.github.io., A 185.199.109.153, A 185.199.108.153, A 185.199.110.153, A 185.199.111.153 (158)
+04:32:36.555860 IP 172.30.240.1.53 > 172.30.253.88.51003: 5787- 6/0/0 A 74.6.231.21, A 74.6.143.25, A 74.6.231.20, A 98.137.11.164, A 98.137.11.163, A 74.6.143.26 (132)
+    """
+    dns_response = re.search( 'IP6? (.*?.53) > .*?\.(\d+): (\d+)-? \d+\/\d+\/\d+.*? (?:A|AAAA) ([\w\.:, ]+) \(', line)
+    if dns_response:
+        match_dns_info(dns_response)
 
     # See if local addresses / broadcasters can be placed on the left
     for add in all_adds:
@@ -497,6 +614,41 @@ def write_output(get):
             print( 'stderr', line.rstrip().decode("utf-8"))
         else:
             prettify_tcpdump_line_so_it_looks_nice( line.rstrip().decode("utf-8"))
+
+"""
+#### main() ###
+"""
+
+import random
+tcpdump_logo_strings = [ [], ['>', '+', '.', ':'],
+    ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ'],
+    ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6'],
+    ['12'+random.choice('123456789')+'.', '45'+random.choice('123456789')+'.', '[S.]', 'MSFT', 'AAAA'],
+    [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.com', 'MCAST', 'AZURE'],
+    ['200'+random.choice('1234567890abcdef')+'::', random.choice('1234567890abcdef')+'f::fb', 'AKAMAI', 'GOOGLE', 'GCLOUD'],
+    ['RFC1918', '',''],
+    ['', '',''],
+    ['', '',''],
+    ['', '',''],
+    ['', '',''],
+]
+
+def r( o):
+    return random.choice( tcpdump_logo_strings[ len( o.group(0))])
+
+def usage():
+    colored_logo = ctd_logo
+    colored_logo = re.sub( '([^\s]{1,6})', r, colored_logo)
+
+    colored_logo = re.sub( '([^\s]{1,6})', colorize_match, colored_logo)
+    #colored_logo = re.sub( '(_+)', Fore.BLUE + '\g<1>' + Style.RESET_ALL, colored_logo)
+    #colored_logo = re.sub( '_/', f'_{Style.BRIGHT}{Fore.BLUE}/{Style.RESET_ALL}', colored_logo)
+    print( colored_logo)
+    exit(1)
+
+if len( cmd) < 2:
+    usage()
+
 
 process = subprocess.Popen(
     cmd, stdout=PIPE, stderr=PIPE, close_fds=True, bufsize=1)

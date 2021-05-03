@@ -64,12 +64,12 @@ Back.BLUE + Style.BRIGHT + Fore.RED,
 Back.BLUE + Style.BRIGHT + Fore.GREEN,
 Back.BLUE + Style.BRIGHT + Fore.YELLOW,
 Back.BLUE + Style.BRIGHT + Fore.BLUE,
-Back.BLUE + Style.BRIGHT + Fore.MAGENTA,
+#Back.BLUE + Style.BRIGHT + Fore.MAGENTA,
 Back.BLUE + Style.BRIGHT + Fore.CYAN,
 Back.BLUE + Style.BRIGHT + Fore.WHITE,
 
 Back.WHITE + Fore.RED,
-Back.WHITE + Fore.YELLOW,
+#Back.WHITE + Fore.YELLOW,
 Back.WHITE + Fore.MAGENTA,
 #Back.WHITE + Style.BRIGHT + Fore.RED,
 #Back.WHITE + Style.BRIGHT + Fore.YELLOW,
@@ -128,7 +128,6 @@ for b in all_broadcasts:
 print(Style.RESET_ALL)
 print('back to normal now')
 
-cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
 
 
 
@@ -141,6 +140,14 @@ import threading
 import subprocess
 PIPE = subprocess.PIPE
 
+
+print("Argument List:", str(sys.argv))
+cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
+cmd = ['/sbin/tcpdump', '-lni', 'eth0']
+# TODO: add check for windows / windump / tshark?
+cmd = ['/sbin/tcpdump']
+cmd += sys.argv[1:]
+print( "tcpdump command to be executed: ", cmd)
 
 """
 hex = qr/[0-9a-f]/;
@@ -195,93 +202,106 @@ reader = geolite2.reader()
 #pprint(vars(object))
 """
 
+# A bit like an example of how this array is built
 ranges_info = {
-    'RFC1918': { 
-        '10.0.0.0/8': 'A',
-        '172.16.0.0/12': 'B',
-        '192.168.0.0/16': 'C'
-    },
-    'MCAST':
-    {
-        '224.0.0.1/32': 'hosts',
-        '224.0.0.2/32': 'routers',
-        '224.0.0.4/32': 'DVMRP',
-        '224.0.0.5/32': 'OSPF',
-        '224.0.0.6/32': 'OSPFDR',
-        '224.0.0.9/32': 'RIP2',
-        '224.0.0.10/32': 'EIGRP',
-        '224.0.0.13/32': 'PIM',
-        '224.0.0.18/32': 'VRRP',
-        '224.0.0.19/32': 'IS-ISoIP',
-        '224.0.0.20/32': 'IS-ISoIP',
-        '224.0.0.21/32': 'IS-ISoIP',
-        '224.0.0.22/32': 'IGMP',
-        '224.0.0.102/32': 'HSRPv2',
-        '224.0.0.107/32': 'PTP',
-        '224.0.0.251/32': 'mDNS',
-        '224.0.0.252/32': 'LLMNR',
-        '224.0.0.253/32': 'Teredo',
-        '224.0.1.1/32': 'NTP',
-        '224.0.1.22/32': 'SLP',
-        '224.0.1.35/32': 'SLP',
-        '224.0.1.39/32': 'CISCO-ANNOUNCE',
-        '224.0.1.40/32': 'CISCO-DISCOVER',
-        '224.0.1.41/32': 'H.323GK',
-        '224.0.1.128/30': 'PTP',
-        '239.255.255.250/32': 'SSD',
-        '239.255.255.253/32': 'SLP',
-        'ff02::1': 'hosts',
-        'ff02::2': 'routers',
-        'ff02::5': 'OSPF',
-        'ff02::6': 'OSPFDR',
-        'ff02::9': 'RIP2',
-        'ff02::a': 'EIGRP',
-        'ff02::d': 'PIM',
-        'ff02::12': 'VRRP',
-        'ff02::8': 'IS-ISoIP',
-        'ff02::16': 'MLDv2',
-        'ff02::1:2': 'DHCPv6',
-        'ff00::fb/128': 'mDNS',
-        'ff01::fb/128': 'mDNS',
-        'ff02::fb/128': 'mDNS',
-        'ff03::fb/128': 'mDNS',
-        'ff04::fb/128': 'mDNS',
-        'ff02::1:3': 'LLMNR',
-        'ff05::1:3': 'DHCP',
-        'ff00::101': 'NTP',
-        'ff01::101': 'NTP',
-        'ff02::101': 'NTP',
-        'ff03::101': 'NTP',
-        'ff00::181/128': 'PTP-MSG',
-        'ff01::181/128': 'PTP-MSG',
-        'ff02::181/128': 'PTP-MSG',
-        'ff03::181/128': 'PTP-MSG',
-        'ff02::6b/128': 'PTP-PD',
-        'ff00::c/128': 'SSDP',
-        'ff01::c/128': 'SSDP',
-        'ff02::c/128': 'SSDP',
-        'ff03::c/128': 'SSDP'
-    }
+    'RFC1918': [
+        ['10.0.0.0/8', 'A'],
+        ['172.16.0.0/12', 'B'],
+        ['192.168.0.0/16', 'C']
+    ],
+    'MCAST': [
+        ['224.0.0.1/32', 'hosts'],
+        ['224.0.0.2/32', 'routers'],
+        ['224.0.0.4/32', 'DVMRP'],
+        ['224.0.0.5/32', 'OSPF'],
+        ['224.0.0.6/32', 'OSPFDR'],
+        ['224.0.0.9/32', 'RIP2'],
+        ['224.0.0.10/32', 'EIGRP'],
+        ['224.0.0.13/32', 'PIM'],
+        ['224.0.0.18/32', 'VRRP'],
+        ['224.0.0.19/32', 'IS-ISoIP'],
+        ['224.0.0.20/32', 'IS-ISoIP'],
+        ['224.0.0.21/32', 'IS-ISoIP'],
+        ['224.0.0.22/32', 'IGMP'],
+        ['224.0.0.102/32', 'HSRPv2'],
+        ['224.0.0.107/32', 'PTP'],
+        ['224.0.0.251/32', 'mDNS'],
+        ['224.0.0.252/32', 'LLMNR'],
+        ['224.0.0.253/32', 'Teredo'],
+        ['224.0.1.1/32', 'NTP'],
+        ['224.0.1.22/32', 'SLP'],
+        ['224.0.1.35/32', 'SLP'],
+        ['224.0.1.39/32', 'CISCO-ANNOUNCE'],
+        ['224.0.1.40/32', 'CISCO-DISCOVER'],
+        ['224.0.1.41/32', 'H.323GK'],
+        ['224.0.1.128/30', 'PTP'],
+        ['239.255.255.250/32', 'SSD'],
+        ['239.255.255.253/32', 'SLP'],
+        ['ff02::1', 'hosts'],
+        ['ff02::2', 'routers'],
+        ['ff02::5', 'OSPF'],
+        ['ff02::6', 'OSPFDR'],
+        ['ff02::9', 'RIP2'],
+        ['ff02::a', 'EIGRP'],
+        ['ff02::d', 'PIM'],
+        ['ff02::12', 'VRRP'],
+        ['ff02::8', 'IS-ISoIP'],
+        ['ff02::16', 'MLDv2'],
+        ['ff02::1:2', 'DHCPv6'],
+        ['ff00::fb/128', 'mDNS'],
+        ['ff01::fb/128', 'mDNS'],
+        ['ff02::fb/128', 'mDNS'],
+        ['ff03::fb/128', 'mDNS'],
+        ['ff04::fb/128', 'mDNS'],
+        ['ff02::1:3', 'LLMNR'],
+        ['ff05::1:3', 'DHCP'],
+        ['ff00::101', 'NTP'],
+        ['ff01::101', 'NTP'],
+        ['ff02::101', 'NTP'],
+        ['ff03::101', 'NTP'],
+        ['ff00::181/128', 'PTP-MSG'],
+        ['ff01::181/128', 'PTP-MSG'],
+        ['ff02::181/128', 'PTP-MSG'],
+        ['ff03::181/128', 'PTP-MSG'],
+        ['ff02::6b/128', 'PTP-PD'],
+        ['ff00::c/128', 'SSDP'],
+        ['ff01::c/128', 'SSDP'],
+        ['ff02::c/128', 'SSDP'],
+        ['ff03::c/128', 'SSDP']
+    ]
 }
 
 # importing the module
 import json
 
 # Opening JSON file
+print("Loading range data...")
 with open('data/ctd-data.json') as json_file:
     data = json.load(json_file)
     for key,value in data.items():
         print(key)
         ranges_info[ key] = data[ key]
-    pprint( ranges_info)
-
+    #pprint( ranges_info)
+print("Done")
 
 import ipaddress
 
-
+# Ze great IP info cache
+info_cache={}
 
 def get_ip_info( ip):
+
     info = ''
+    dnsinfo = ''
+
+    if ip in dns_cache['by_ip']:
+        dnsinfo = ' ' + crc_colorize( dns_cache['by_ip'][ip])
+
+    if ip in info_cache:
+        #print( 'CACHE HIT')
+        return dnsinfo + " " + info_cache[ ip]
+    #print( 'CACHE MISS')
+
     geoip = reader.get( ip)
     if geoip != None:
         #pprint(geoip)
@@ -293,32 +313,84 @@ def get_ip_info( ip):
         info = f'[{info}]'
 
     for descr in ranges_info.keys():
-        moreinfo = ""
+        moreinfo = []
+        return_info = ""
         #print( 'descr: ', descr)
-        for r in ranges_info[ descr].keys():
+        for tup in ranges_info[ descr]:
+            r = tup[0]
+            rinfo = tup[1]
             #pprint( r)
             found=False
-            if ':' in ip and ':' in r:
-                if ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
-                    found=True
-            elif ':' not in ip and ':' not in r:
+            if ':' not in ip and ':' not in r:
                 if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):
+                    found=True
+                    #print( 'Found ', ip, ' in range ', r, ' which is ', crc_colorize( rinfo))
+            elif ':' in ip and ':' in r:
+                if ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
                     found=True
 #            if ip.search('\.') and ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r)
 #            or ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
                 #print( 'ip is in net', ip, r)
             if found:
-                if moreinfo == "":
-                    moreinfo = crc_colorize( descr)
-                if ranges_info[ descr][ r] != "":
-                    moreinfo += '/' + crc_colorize( ranges_info[ descr][ r])
-        if moreinfo != "":
-            info += f'[{moreinfo}]'
+                moreinfo += [rinfo]
 
-    #  TODO : implement caching update and checking at the beginning
+        #print( 'moreinfo: ', moreinfo)
+        if len(moreinfo) > 0:
+            addinfo = crc_colorize( descr)
+            seen = []
+            for i in moreinfo:
+                #print( 'i: ', i)
+                #print( 'seen: ', seen)
+                #if i in seen:
+                #    print('i in seen?')
+                #else:
+                #    print('i NOT in seen?')
+                if i not in seen and i != "":
+                    addinfo += '/' + crc_colorize( i)
+                    #print( 'addinfo: ', addinfo)
+                seen += [i]
+            info += f'[{addinfo}]'
+
+    # Don't look up this ip again
+    info_cache[ip] = info
+
     if info != "":
-        return " " + info
-    return ""
+        return dnsinfo + " " + info
+
+    # Else nothing to report but DNS (if any found)
+    return dnsinfo
+
+
+dns_cache= {}
+dns_cache['queries'] = {}
+dns_cache['responses'] = {}
+dns_cache['by_ip'] = {}
+
+
+
+def store_dns_info( matchobj):
+    """
+02:28:21.105740 IP 172.30.253.88.(53418) > (1.1.1.1.53: 18184)+ A? (blah.com). (26)
+02:28:21.177084 IP 172.30.253.88.40745 > 1.1.1.1.53: 25446+ AAAA? blah.com. (26)
+    """
+    key = matchobj.group(1) + matchobj.group(2)
+    domain = matchobj.group(3)
+    #print( f'store_dns() key: [{key}] domain: [{domain}]')
+    dns_cache['queries'][key] = domain
+
+def match_dns_info( matchobj):
+    """
+02:33:56.598637 IP (1.1.1.1.53) > 172.30.253.88.(40418): (909) 1/0/0 A (189.113.174.199) (42)
+    """
+    key = matchobj.group(2) + matchobj.group(1) + ': ' + matchobj.group(3)
+    result = matchobj.group(4)
+    #print( f'match_dns() key: [{key}] result: [{result}]')
+    if key in dns_cache['queries']:
+        domain = dns_cache['queries'][ key]
+        #print( f"GOT DNS MATCH: [{domain}] = [{result}]")
+        dns_cache['by_ip'][ result] = domain
+        #pprint( dns_cache['by_ip'])
+
 
 def colorize_match_ip( matchobj):
     return crc_colorize( matchobj.group(1)) + get_ip_info(matchobj.group(1))
@@ -331,7 +403,22 @@ def colorize_match( matchobj):
     return crc_colorize( matchobj.group(1))
 
 def prettify_tcpdump_line_so_it_looks_nice( line):
-    #print( "old:  ", line)
+    print( "old:  ", line)
+    if re.search( ' IP6? .*?53(:| >) .* (A|AAAA)', line):
+        print('found DNS!')
+        """
+015928.483 IP6 fe80::f405:ed12:ae26:7971.5353 > ff02::fb.5353: 0 A (QM)? wpad.local. (28)
+015928.486 IP6 fe80::f405:ed12:ae26:7971.5353 > ff02::fb.5353: 0 AAAA (QM)? wpad.local. (28)
+02:28:21.105740 IP 172.30.253.88.53418 > 1.1.1.1.53: 18184+ A? blah.com. (26)
+02:28:21.177084 IP 172.30.253.88.40745 > 1.1.1.1.53: 25446+ AAAA? blah.com. (26)
+        """
+        line = re.sub( '\.(\d+) > (.*?53: \d+).*?\? ([\w\.]+)\.', store_dns_info, line)
+        """
+02:33:56.598637 IP 1.1.1.1.53 > 172.30.253.88.40418: 909 1/0/0 A 189.113.174.199 (42)
+        """
+        line = re.sub( 'IP6? (.*?.53) > .*?\.(\d+): (\d+) \d+\/\d+\/\d+ (?:A|AAAA) ([\w\.:]+) ', match_dns_info, line)
+
+    # See if local addresses / broadcasters can be placed on the left
     for add in all_adds:
         if re.search( ' > ' + add + f'(:|\.{port})', line):
             #print( "LOCAL on the right found")
@@ -352,9 +439,15 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
     #line = re.sub( '^(\d{2}):(\d+):\d', 'ABC', line)
 
 
-    if re.search( ' IP .*: (?:tcp |UDP,)', line):
+
+
+    if re.search( ' IP .*: (?:tcp |UDP,|Flags)', line):
         line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
-    elif re.search( ' IP6 .*: (?:tcp |UDP,)', line):
+        line = re.sub( '(Flags )(\[S\])', f'\g<1>{Back.BLACK}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
+        line = re.sub( '(Flags )(\[S\.\])', f'\g<1>{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
+        line = re.sub( '(Flags )(\[P.\])', f'\g<1>{Back.GREEN}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
+        line = re.sub( '(Flags )(\[\.\])', f'\g<1>{Back.GREEN}{Style.BRIGHT}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
+    elif re.search( ' IP6 .*: (?:tcp |UDP,|0)', line):
         line = re.sub( f'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
     elif re.search( ': ICMP ', line):
         line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)

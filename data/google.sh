@@ -8,14 +8,14 @@ URL="https://www.gstatic.com/ipranges/goog.json"
 wget -O "$SOURCE" "$URL"
 
 grep '/' "$SOURCE" | \
-	awk '{ print $2 ": \"\"" }' | \
+	awk '{ print $2 ", \"\"" }' | \
 	sort -uV | \
 	tee /tmp/p
 
-echo -e '\t"GOOG": {' | tee "$OUTPUT"
+echo -e '\t"GOOG": [' | tee "$OUTPUT"
 awk 'BEGIN{
 	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
-	{print "\t" $0, ((last==FNR) ? "\n\t}\n" :",")}' /tmp/p | \
+	{print "\t[" $0 "]", ((last==FNR) ? "\n\t]\n" :",")}' /tmp/p | \
 		tee -a "$OUTPUT"
 
 #jq '.values[].properties | . as $line | .addressPrefixes[] as $a | [$a, $line.systemService] | @tsv' < azure-ipranges.txt | \

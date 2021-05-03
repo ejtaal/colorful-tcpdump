@@ -8,13 +8,13 @@ URL="https://download.microsoft.com/download/B/2/A/B2AB28E1-DAE1-44E8-A867-4987F
 
 #wget -O "$SOURCE" "$URL"
 
-echo -e '\t"MSFT": {' | tee "$OUTPUT"
+echo -e '\t"MSFT": [' | tee "$OUTPUT"
 grep '/' "$SOURCE" | \
 	cut -f 1 -d, > /tmp/p
 
 awk 'BEGIN{
 	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
-	{print "\t\"" $0 "\": \"\"", ((last==FNR) ? "\n\t}\n" :",")}' /tmp/p | \
+	{print "\t[\"" $0 "\", \"\"]", ((last==FNR) ? "\n\t]\n" :",")}' /tmp/p | \
 		tee -a "$OUTPUT"
 
 #awk "BEGIN{

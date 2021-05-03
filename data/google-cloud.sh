@@ -8,14 +8,15 @@ URL="https://www.gstatic.com/ipranges/cloud.json"
 #wget -O "$SOURCE" "$URL"
 
 grep '/' "$SOURCE" | \
-	awk '{ print $2 ": \"\"" }' | \
+	tr -d ',' | \
+	awk '{ print $2 ", \"\"" }' | \
 	sort -uV | \
 	tee /tmp/p
 
-echo -e '\t"GCLOUD": {' | tee "$OUTPUT"
+echo -e '\t"GCLOUD": [' | tee "$OUTPUT"
 awk 'BEGIN{
 	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
-	{print "\t" $0, ((last==FNR) ? "\n\t}\n" :",")}' /tmp/p | \
+	{print "\t[" $0 "]", ((last==FNR) ? "\n\t]\n" :",")}' /tmp/p | \
 		tee -a "$OUTPUT"
 
 #jq '.values[].properties | . as $line | .addressPrefixes[] as $a | [$a, $line.systemService] | @tsv' < azure-ipranges.txt | \

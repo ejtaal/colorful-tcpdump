@@ -34,16 +34,16 @@ ctd_logo = """
   8888     ,88'   `8888     ,88'   88888      `8888     ,88'   88888   `8b.   88888          8888   ,d8P  88888         
    `8888888P'       `8888888P'     888888888888 `8888888P'     88888     `88. 88888           `Y88888P'   8888888888888 
 
-8888888888888888 ,o888888o.    8888888888o   8888888888o.      88888      88        ,8.       ,8.          8888888888o    
-      88888     8888     `88.  88888    `88. 88888    `^888.   88888      88       ,888.     ,888.         88888    `88.  
-      88888   ,88888       `8. 88888     `88 88888        `88. 88888      88      .`8888.   .`8888.        88888     `88  
-      88888   888888           88888     ,88 88888         `88 88888      88     ,8.`8888. ,8.`8888.       88888     ,88  
-      88888   888888           88888.   ,88' 88888          88 88888      88    ,8'8.`8888,8^8.`8888.      88888.   ,88'  
-      88888   888888           8888888888P'  88888          88 88888      88   ,8' `8.`8888' `8.`8888.     8888888888P'   
-      88888   888888           88888         88888         ,88 88888      88  ,8'   `8.`88'   `8.`8888.    88888          
-      88888   `88888       .8' 88888         88888        ,88' `8888     ,8P ,8'     `8.`'     `8.`8888.   88888          
-      88888     8888     ,88'  88888         88888    ,o88P'    8888   ,d8P ,8'       `8        `8.`8888.  88888          
-      88888      `8888888P'    88888         8888888888P'        `Y88888P' ,8'         `         `8.`8888. 88888
+888888888888888 ,o888888o.    8888888888o   8888888888o.      88888      88        ,8.       ,8.          8888888888o    
+      8888     8888     `88.  88888    `88. 88888    `^888.   88888      88       ,888.     ,888.         88888    `88.  
+      8888   ,88888       `8. 88888     `88 88888        `88. 88888      88      .`8888.   .`8888.        88888     `88  
+      8888   888888           88888     ,88 88888         `88 88888      88     ,8.`8888. ,8.`8888.       88888     ,88  
+      8888   888888           88888.   ,88' 88888          88 88888      88    ,8'8.`8888,8^8.`8888.      88888.   ,88'  
+      8888   888888           8888888888P'  88888          88 88888      88   ,8' `8.`8888' `8.`8888.     8888888888P'   
+      8888   888888           88888         88888         ,88 88888      88  ,8'   `8.`88'   `8.`8888.    88888          
+      8888   `88888       .8' 88888         88888        ,88' `8888     ,8P ,8'     `8.`'     `8.`8888.   88888          
+      8888     8888     ,88'  88888         88888    ,o88P'    8888   ,d8P ,8'       `8        `8.`8888.  88888          
+      8888      `8888888P'    88888         8888888888P'        `Y88888P' ,8'         `         `8.`8888. 88888
 """
 
 """
@@ -240,8 +240,9 @@ print("Argument List:", str(sys.argv))
 cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
 cmd = ['/sbin/tcpdump', '-lni', 'eth0']
 # TODO: add check for windows / windump / tshark?
-cmd = ['/sbin/tcpdump']
-cmd += sys.argv[1:]
+# cmd = ['/sbin/tcpdump']
+# cmd += sys.argv[1:]
+cmd = sys.argv
 
 
 print( "tcpdump command to be executed: ", cmd)
@@ -622,7 +623,7 @@ def write_output(get):
 import random
 tcpdump_logo_strings = [ [], ['>', '+', '.', ':'],
     ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ'],
-    ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6'],
+    ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6', 'TOR'],
     ['12'+random.choice('123456789')+'.', '45'+random.choice('123456789')+'.', '[S.]', 'MSFT', 'AAAA'],
     [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.com', 'MCAST', 'AZURE'],
     ['200'+random.choice('1234567890abcdef')+'::', random.choice('1234567890abcdef')+'f::fb', 'AKAMAI', 'GOOGLE', 'GCLOUD'],
@@ -643,7 +644,21 @@ def usage():
     colored_logo = re.sub( '([^\s]{1,6})', colorize_match, colored_logo)
     #colored_logo = re.sub( '(_+)', Fore.BLUE + '\g<1>' + Style.RESET_ALL, colored_logo)
     #colored_logo = re.sub( '_/', f'_{Style.BRIGHT}{Fore.BLUE}/{Style.RESET_ALL}', colored_logo)
+
     print( colored_logo)
+
+    print("""
+
+    Usage: ./ctd [CTD-OPTION] ... [TCPDUMPLIKE-COMMAND + arguments]
+        CTD-OPTION: [--indent INT]
+        TCPDUMPLINE-COMMAND: [ tcpdump / pktmon / tshark / traceroute ]
+
+    Examples:
+        ./ctd tcpdump -lni eth0
+        ./ctd /mnt/c/Windows/System32/PktMon.exe start -c --comp nics -m real-time (In WSL running as Administrator)
+        ./ctd C:\Windows\system32\PktMon.exe start -c --comp nics -m real-time (In native windows running as Administrator)
+
+    """)
     exit(1)
 
 if len( cmd) < 2:

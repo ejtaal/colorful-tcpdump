@@ -1,13 +1,88 @@
 #!/usr/bin/env python3
 
-#8from netifaces import interfaces, ifaddresses, AF_INET
-from netifaces import *
+usage_text="""
+
+    Welcome to Colorful tcpdump!
+
+    Usage: ./ctd [CTD-OPTION] ... [TCPDUMPLIKE-COMMAND + arguments]
+        CTD-OPTION: [ --indent INT] [ --detect-local-from-input ]
+        TCPDUMPLINE-COMMAND: [ - / tcpdump / pktmon / tshark / traceroute ]
+
+    Available CTD-OPTIONs:
+
+    --indent INT
+    -i INT
+        indent allput by INT spaces. This allows you to run one ctd in
+        the background (e.g. with the & operater in bash), for 
+        instance listening on eth0. Then when you open a VPN tunnel,
+        run ctd in the foreground with an indent of 4. This should give
+        a nice output of external & internal traffic.
+
+    --detect-local-from-input
+    -d
+        If you run ctd for example throgh a pipe from another systen,
+        be it an ssh command run elsewhere, or on windows while ctd runs
+        inside WSL, then ctd's local IPs detection won't make sense.
+        Prepend the relevant command for your OS to the tcpdump command
+        for ctd to pick up those local IPs instead of letting it try to
+        do that itself. Commands that will be supported include:
+        ifconfig, ip adddr and  ipconfig /all.
+        Examples:
+        1.
+        Running pktmon.exe from WSL (need to start WSL as Administrator
+        to be able to do this):
+        WSL-bash$ { C:\Windows\system32\ipconfig.exe /all; PktMon.exe start -c --comp nics -m real-time } | ./ctd --detect-local-from-input
+        2.
+        Running tcpdump on a remote host and piping the output back via ssh:
+        bash$ ssh root@ubuntu "ip addr; tcpdump -lni eth0" | ./ctd --detect-local-from-input
+
+    --debug LEVEL
+        Also show the original lines before they were mangled by CTD  o_O
+        LEVEL can be 1 to 5, the higher, the more verbose
+
+    More examples:
+        ./ctd tcpdump -lni eth0
+        ./ctd /mnt/c/Windows/System32/PktMon.exe start -c --comp nics -m real-time (In WSL running as Administrator)
+        ./ctd C:\Windows\system32\PktMon.exe start -c --comp nics -m real-time (In native windows running as Administrator)
+
+    """
+
+ctd_logo = """
+   ,o888888o.       ,o888888o.     88888        ,o888888o.     8888888888o.   88888888888   88888      88 88888         
+  8888     `88.   .8888     `88.   88888      .8888     `88.   88888    `88.  88888         88888      88 88888         
+,88888       `8. ,88888       `8b  88888     ,88888       `8b  88888     `88  88888         88888      88 88888         
+888888           888888        `8b 88888     888888        `8b 88888     ,88  88888         88888      88 88888         
+888888           888888         88 88888     888888         88 88888.   ,88'  888888888     88888      88 88888         
+888888           888888         88 88888     888888         88 8888888888P'   88888         88888      88 88888         
+888888           888888        ,8P 88888     888888        ,8P 88888`8b       88888         88888      88 88888         
+`88888       .8' `88888       ,8P  88888     `88888       ,8P  88888 `8b.     88888         `8888     ,8P 88888         
+  8888     ,88'   `8888     ,88'   88888      `8888     ,88'   88888   `8b.   88888          8888   ,d8P  88888         
+   `8888888P'       `8888888P'     888888888888 `8888888P'     88888     `88. 88888           `Y88888P'   8888888888888 
+
+# ## ### #### ##### ###### ####### # ## ### #### ##### ###### ####### # ## ### #### ##### ###### ####### # ## ### ####
+####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ######
+
+888888888888888 ,o888888o.    8888888888o   8888888888o.      88888      88        ,8.       ,8.          8888888888o    
+      8888     8888     `88.  88888    `88. 88888    `^888.   88888      88       ,888.     ,888.         88888    `88.  
+      8888   ,88888       `8. 88888     `88 88888        `88. 88888      88      .`8888.   .`8888.        88888     `88  
+      8888   888888           88888     ,88 88888         `88 88888      88     ,8.`8888. ,8.`8888.       88888     ,88  
+      8888   888888           88888.   ,88' 88888          88 88888      88    ,8'8.`8888,8^8.`8888.      88888.   ,88'  
+      8888   888888           8888888888P'  88888          88 88888      88   ,8' `8.`8888' `8.`8888.     8888888888P'   
+      8888   888888           88888         88888         ,88 88888      88  ,8'   `8.`88'   `8.`8888.    88888          
+      8888   `88888       .8' 88888         88888        ,88' `8888     ,8P ,8'     `8.`'     `8.`8888.   88888          
+      8888     8888     ,88'  88888         88888    ,o88P'    8888   ,d8P ,8'       `8        `8.`8888.  88888          
+      8888      `8888888P'    88888         8888888888P'        `Y88888P' ,8'         `         `8.`8888. 88888
+
+# ## ### #### ##### ###### ####### # ## ### #### ##### ###### ####### # ## ### #### ##### ###### ####### # ## ### ####
+####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ######
+"""
 
 all_adds = []
 all_broadcasts = []
-
 all_ifs = []
 
+from netifaces import *
+# TODO: detect running on windows and detect IPs there the right way(tm)
 for ifaceName in interfaces():
     #all_ifs.append( ifaddresses(ifaceName))
     for key, value in ifaddresses(ifaceName).items():
@@ -22,125 +97,8 @@ for ifaceName in interfaces():
             if value[0]['broadcast'] not in all_broadcasts:
                 all_broadcasts.append( value[0]['broadcast'])
 
-ctd_logo = """
-   ,o888888o.       ,o888888o.     88888        ,o888888o.     8888888888o.   88888888888   88888      88 88888         
-  8888     `88.   .8888     `88.   88888      .8888     `88.   88888    `88.  88888         88888      88 88888         
-,88888       `8. ,88888       `8b  88888     ,88888       `8b  88888     `88  88888         88888      88 88888         
-888888           888888        `8b 88888     888888        `8b 88888     ,88  88888         88888      88 88888         
-888888           888888         88 88888     888888         88 88888.   ,88'  888888888     88888      88 88888         
-888888           888888         88 88888     888888         88 8888888888P'   88888         88888      88 88888         
-888888           888888        ,8P 88888     888888        ,8P 88888`8b       88888         88888      88 88888         
-`88888       .8' `88888       ,8P  88888     `88888       ,8P  88888 `8b.     88888         `8888     ,8P 88888         
-  8888     ,88'   `8888     ,88'   88888      `8888     ,88'   88888   `8b.   88888          8888   ,d8P  88888         
-   `8888888P'       `8888888P'     888888888888 `8888888P'     88888     `88. 88888           `Y88888P'   8888888888888 
 
-888888888888888 ,o888888o.    8888888888o   8888888888o.      88888      88        ,8.       ,8.          8888888888o    
-      8888     8888     `88.  88888    `88. 88888    `^888.   88888      88       ,888.     ,888.         88888    `88.  
-      8888   ,88888       `8. 88888     `88 88888        `88. 88888      88      .`8888.   .`8888.        88888     `88  
-      8888   888888           88888     ,88 88888         `88 88888      88     ,8.`8888. ,8.`8888.       88888     ,88  
-      8888   888888           88888.   ,88' 88888          88 88888      88    ,8'8.`8888,8^8.`8888.      88888.   ,88'  
-      8888   888888           8888888888P'  88888          88 88888      88   ,8' `8.`8888' `8.`8888.     8888888888P'   
-      8888   888888           88888         88888         ,88 88888      88  ,8'   `8.`88'   `8.`8888.    88888          
-      8888   `88888       .8' 88888         88888        ,88' `8888     ,8P ,8'     `8.`'     `8.`8888.   88888          
-      8888     8888     ,88'  88888         88888    ,o88P'    8888   ,d8P ,8'       `8        `8.`8888.  88888          
-      8888      `8888888P'    88888         8888888888P'        `Y88888P' ,8'         `         `8.`8888. 88888
-"""
-
-"""
- ::::::::   ::::::::  :::        ::::::::  :::::::::  :::::::::: :::    ::: :::        
-:+:    :+: :+:    :+: :+:       :+:    :+: :+:    :+: :+:        :+:    :+: :+:        
-+:+        +:+    +:+ +:+       +:+    +:+ +:+    +:+ +:+        +:+    +:+ +:+        
-+#+        +#+    +:+ +#+       +#+    +:+ +#++:++#:  :#::+::#   +#+    +:+ +#+        
-+#+        +#+    +#+ +#+       +#+    +#+ +#+    +#+ +#+        +#+    +#+ +#+        
-#+#    #+# #+#    #+# #+#       #+#    #+# #+#    #+# #+#        #+#    #+# #+#        
- ########   ########  ########## ########  ###    ### ###         ########  ########## 
-
-::::::::::: ::::::::  :::::::::  :::::::::  :::    ::: ::::    ::::  :::::::::         
-    :+:    :+:    :+: :+:    :+: :+:    :+: :+:    :+: +:+:+: :+:+:+ :+:    :+:        
-    +:+    +:+        +:+    +:+ +:+    +:+ +:+    +:+ +:+ +:+:+ +:+ +:+    +:+        
-    +#+    +#+        +#++:++#+  +#+    +:+ +#+    +:+ +#+  +:+  +#+ +#++:++#+         
-    +#+    +#+        +#+        +#+    +#+ +#+    +#+ +#+       +#+ +#+               
-    #+#    #+#    #+# #+#        #+#    #+# #+#    #+# #+#       #+# #+#               
-    ###     ########  ###        #########   ########  ###       ### ###   
-"""
-
-"""
-  sSSs    sSSs_sSSs    S.        sSSs_sSSs     .S_sSSs      sSSs   .S       S.   S.      
- d%%SP   d%%SP~YS%%b   SS.      d%%SP~YS%%b   .SS~YS%%b    d%%SP  .SS       SS.  SS.     
-d%S'    d%S'     `S%b  S%S     d%S'     `S%b  S%S   `S%b  d%S'    S%S       S%S  S%S     
-S%S     S%S       S%S  S%S     S%S       S%S  S%S    S%S  S%S     S%S       S%S  S%S     
-S&S     S&S       S&S  S&S     S&S       S&S  S%S    d*S  S&S     S&S       S&S  S&S     
-S&S     S&S       S&S  S&S     S&S       S&S  S&S   .S*S  S&S_Ss  S&S       S&S  S&S     
-S&S     S&S       S&S  S&S     S&S       S&S  S&S_sdSSS   S&S~SP  S&S       S&S  S&S     
-S&S     S&S       S&S  S&S     S&S       S&S  S&S~YSY%b   S&S     S&S       S&S  S&S     
-S*b     S*b       d*S  S*b     S*b       d*S  S*S   `S%b  S*b     S*b       d*S  S*b     
-S*S.    S*S.     .S*S  S*S.    S*S.     .S*S  S*S    S%S  S*S     S*S.     .S*S  S*S.    
- SSSbs   SSSbs_sdSSS    SSSbs   SSSbs_sdSSS   S*S    S&S  S*S      SSSbs_sdSSS    SSSbs  
-  YSSP    YSSP~YSSY      YSSP    YSSP~YSSY    S*S    SSS  S*S       YSSP~YSSY      YSSP  
-                                              SP          SP                             
-                                              Y           Y                              
-                                                                                         
-sdSS_SSSSSSbs    sSSs   .S_sSSs     .S_sSSs     .S       S.    .S_SsS_S.    .S_sSSs      
-YSSS~S%SSSSSP   d%%SP  .SS~YS%%b   .SS~YS%%b   .SS       SS.  .SS~S*S~SS.  .SS~YS%%b     
-     S%S       d%S'    S%S   `S%b  S%S   `S%b  S%S       S%S  S%S `Y' S%S  S%S   `S%b    
-     S%S       S%S     S%S    S%S  S%S    S%S  S%S       S%S  S%S     S%S  S%S    S%S    
-     S&S       S&S     S%S    d*S  S%S    S&S  S&S       S&S  S%S     S%S  S%S    d*S    
-     S&S       S&S     S&S   .S*S  S&S    S&S  S&S       S&S  S&S     S&S  S&S   .S*S    
-     S&S       S&S     S&S_sdSSS   S&S    S&S  S&S       S&S  S&S     S&S  S&S_sdSSS     
-     S&S       S&S     S&S~YSSY    S&S    S&S  S&S       S&S  S&S     S&S  S&S~YSSY      
-     S*S       S*b     S*S         S*S    d*S  S*b       d*S  S*S     S*S  S*S           
-     S*S       S*S.    S*S         S*S   .S*S  S*S.     .S*S  S*S     S*S  S*S           
-     S*S        SSSbs  S*S         S*S_sdSSS    SSSbs_sdSSS   S*S     S*S  S*S           
-     S*S         YSSP  S*S         SSS~YSSY      YSSP~YSSY    SSS     S*S  S*S           
-     SP                SP                                             SP   SP            
-     Y                 Y                                              Y    Y        
-"""
-
-"""
-________/\\\\\\\\\________________/\\\\\\_______________________________________/\\\\\________________/\\\\\\____        
- _____/\\\////////________________\////\\\_____________________________________/\\\///________________\////\\\____       
-  ___/\\\/____________________________\/\\\____________________________________/\\\_______________________\/\\\____      
-   __/\\\_________________/\\\\\_______\/\\\________/\\\\\_____/\\/\\\\\\\___/\\\\\\\\\____/\\\____/\\\____\/\\\____     
-    _\/\\\_______________/\\\///\\\_____\/\\\______/\\\///\\\__\/\\\/////\\\_\////\\\//____\/\\\___\/\\\____\/\\\____    
-     _\//\\\_____________/\\\__\//\\\____\/\\\_____/\\\__\//\\\_\/\\\___\///_____\/\\\______\/\\\___\/\\\____\/\\\____   
-      __\///\\\__________\//\\\__/\\\_____\/\\\____\//\\\__/\\\__\/\\\____________\/\\\______\/\\\___\/\\\____\/\\\____  
-       ____\////\\\\\\\\\__\///\\\\\/____/\\\\\\\\\__\///\\\\\/___\/\\\____________\/\\\______\//\\\\\\\\\___/\\\\\\\\\_ 
-        _______\/////////_____\/////_____\/////////_____\/////_____\///_____________\///________\/////////___\/////////__
-___________________________________________________/\\\__________________________________________________                
- __________________________________________________\/\\\__________________________________________________               
-  _____/\\\______________________/\\\\\\\\\_________\/\\\______________________________________/\\\\\\\\\__              
-   __/\\\\\\\\\\\_____/\\\\\\\\__/\\\/////\\\________\/\\\___/\\\____/\\\____/\\\\\__/\\\\\____/\\\/////\\\_             
-    _\////\\\////____/\\\//////__\/\\\\\\\\\\____/\\\\\\\\\__\/\\\___\/\\\__/\\\///\\\\\///\\\_\/\\\\\\\\\\__            
-     ____\/\\\_______/\\\_________\/\\\//////____/\\\////\\\__\/\\\___\/\\\_\/\\\_\//\\\__\/\\\_\/\\\//////___           
-      ____\/\\\_/\\__\//\\\________\/\\\_________\/\\\__\/\\\__\/\\\___\/\\\_\/\\\__\/\\\__\/\\\_\/\\\_________          
-       ____\//\\\\\____\///\\\\\\\\_\/\\\_________\//\\\\\\\/\\_\//\\\\\\\\\__\/\\\__\/\\\__\/\\\_\/\\\_________         
-        _____\/////_______\////////__\///___________\///////\//___\/////////___\///___\///___\///__\///__________      """
-"""
-   _____      _             __       _           
-  / ____|    | |           / _|     | |          
- | |     ___ | | ___  _ __| |_ _   _| |          
- | |    / _ \| |/ _ \| '__|  _| | | | |          
- | |___| (_) | | (_) | |  | | | |_| | |          
-  \_____\___/|_|\___/|_| _|_|  \__,_|_|          
- |__   __/ ____|  __ \  | |                      
-    | | | |    | |__) |_| |_   _ _ __ ___  _ __  
-    | | | |    |  ___/ _` | | | | '_ ` _ \| '_ \ 
-    | | | |____| |  | (_| | |_| | | | | | | |_) |
-    |_|  \_____|_|   \__,_|\__,_|_| |_| |_| .__/ 
-                                          | |    
-                                          |_|    
-"""
-
-
-
-    #addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-    #print ( ifaceName, 'addr', [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_LINK, [{'addr':'No IP addr'}] )])
-
-    #if ( 'broadcast' in i):
-    #print ( ifaceName, 'broadcast', ifaddresses(ifaceName) )
-    #print( '%s: %s' % (ifaceName, ', '.join(addresses)) )
-
-
+# TODO: Use colored module for supposedly 256 color support
 from colorama import *
 init()
 """
@@ -150,7 +108,7 @@ Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 Style: DIM, NORMAL, BRIGHT, RESET_ALL
 """
 nice_colors = [
-Back.BLUE + Fore.GREEN,
+#Back.BLUE + Fore.GREEN,
 Back.BLUE + Fore.YELLOW,
 #Back.BLUE + Fore.MAGENTA,
 Back.BLUE + Fore.CYAN,
@@ -200,7 +158,7 @@ Back.BLACK + Style.BRIGHT + Fore.YELLOW,
 Back.BLACK + Style.BRIGHT + Fore.BLUE,
 Back.BLACK + Style.BRIGHT + Fore.MAGENTA,
 Back.BLACK + Style.BRIGHT + Fore.CYAN,
-Back.BLACK + Style.BRIGHT + Fore.WHITE,
+#Back.BLACK + Style.BRIGHT + Fore.WHITE,
 ]
 nice_colors_num = len( nice_colors)
 import binascii
@@ -210,20 +168,18 @@ def crc_colorize( s):
     #print( s, crc, crc % nice_colors_num)
     return( nice_colors[ crc % nice_colors_num] + s + Style.RESET_ALL)
 
-for i in nice_colors:
-    print( i + "Some text that is supposed to be readable" + Style.RESET_ALL)
+#for i in nice_colors:
+#    print( i + "Some text that is supposed to be readable" + Style.RESET_ALL)
+#print(Style.RESET_ALL)
+#print('back to normal now')
 
+print( 'Our network addresses (will be placed on the left):')
 for a in all_adds:
-    print( 'Add:', crc_colorize( a))
+    print( crc_colorize( a))
 
+print( 'Local broadcast addresses:')
 for b in all_broadcasts:
-    print( 'Broadcast:', crc_colorize( b))
-
-
-print(Style.RESET_ALL)
-print('back to normal now')
-
-
+    print( crc_colorize( b))
 
 
 import re
@@ -237,15 +193,17 @@ PIPE = subprocess.PIPE
 
 
 print("Argument List:", str(sys.argv))
-cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
-cmd = ['/sbin/tcpdump', '-lni', 'eth0']
+#cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
+#cmd = ['/sbin/tcpdump', '-lni', 'eth0']
+
 # TODO: add check for windows / windump / tshark?
+# TODO: Rather, detect it based on input
+# TODO: Parse those arguments so nicely described in the usage notes
 # cmd = ['/sbin/tcpdump']
 # cmd += sys.argv[1:]
 cmd = sys.argv
 
 
-print( "tcpdump command to be executed: ", cmd)
 
 """
 hex = qr/[0-9a-f]/;
@@ -512,8 +470,20 @@ def colorize_match_ip_port( matchobj):
 def colorize_match( matchobj):
     return crc_colorize( matchobj.group(1))
 
+pktmon_prefix = ""
+
 def prettify_tcpdump_line_so_it_looks_nice( line):
-    print( "old:  ", line)
+    global pktmon_prefix
+    print( f"{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}old:{Style.RESET_ALL}{line}")
+
+    """
+    CF +QoS DA:E4-A4-71-B3-75-72 BSSID:80-26-89-AB-D9-84 SA:E4-A4-71-B3-75-72 Data IV:3aaaa Pad 0 KeyID 0
+    """
+    if re.search('^\s+CF \+QoS DA', line):
+        # Doesn't look too useful
+        return
+
+
     if re.search( ' IP6? .*?53(:| >) .* (A|AAAA)', line):
         print('found DNS!')
         """
@@ -550,13 +520,36 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
                 + f'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
                 + '\g<3>', line)
 
-    #line = re.sub( ipv4_addr, colorize_match, line)
-    # Fix time, also so that it doesn't get recognised as ipv6 :D
-    # Also why does \d{2} not work in the second etc groupings?!?
+    # Time refix reformatting, works for  pktmon & tcpdump
     line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', '\g<1>\g<2>\g<3>.\g<4> ', line)
-    #line = re.sub( '^(\d{2}):(\d+):\d', 'ABC', line)
+
+    # pktmon.exe:
+    """
+    BSSID:80-26-89-AB-D9-84 SA:E4-A4-71-B3-75-72 DA:80-26-89-AB-D9-84 LLC, dsap SNAP (0xaa) Individual, ssap SNAP (0xaa) Command, ctrl 0x03: oui Ethernet (0x000000), ethertype IPv6 (0x86dd), length 99: 2001:e68:542c:361a:2092:bc22:2d56:3032.63292 > 2404:6800:4001:80e::200e.443: Flags [P.], seq 2226039764:2226039803, ack 1995787296, win 513, length 39
+    """
+    pktmon_logline = re.search( 'PktGroupId \d+, .*? Direction (.x) , Type (.*?) ,', line)
+    if pktmon_logline:
+        #print('MARK2', pktmon_logline.group(1), pktmon_logline.group(2), 'END' )
+        pktmon_prefix = re.sub( ' PktGroupId.*', '', line)
+        #print('MARK3', pktmon_prefix)
+        # Don't print this line unless we want ARP traffic (rarely)
+        return
+    elif pktmon_prefix != "":
+        line = f"{pktmon_prefix} {line}"
+
+    # TODO: Speed up matching based on source program detected
 
 
+    if re.search( 'BSSID:.*?, ethertype IP', line):
+        print('MARK')
+        line = re.sub( f'\s+BSSID:.*?, ethertype (IPv\d) .*?: (.*)$', ' \g<1> \g<2>', line)
+        line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
+    """
+00-0C-29-07-BD-09 > FF-FF-FF-FF-FF-FF, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: UDP, length 300
+    """
+    pktmon_udp_pkt = re.search('[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?: (.*: UDP, length \d+)$', line)
+    if pktmon_udp_pkt:
+        line = re.sub('[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?: (.*: UDP, length \d+)$', '\g<1> \g<2>', line)
 
 
     if re.search( ' IP .*: (?:tcp |UDP,|Flags)', line):
@@ -624,9 +617,9 @@ import random
 tcpdump_logo_strings = [ [], ['>', '+', '.', ':'],
     ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ'],
     ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6', 'TOR'],
-    ['12'+random.choice('123456789')+'.', '45'+random.choice('123456789')+'.', '[S.]', 'MSFT', 'AAAA'],
-    [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.com', 'MCAST', 'AZURE'],
-    ['200'+random.choice('1234567890abcdef')+'::', random.choice('1234567890abcdef')+'f::fb', 'AKAMAI', 'GOOGLE', 'GCLOUD'],
+    ['12'+random.choice('123456789')+'.', '23'+random.choice('123456789')+'.', '[S.]', 'MSFT', 'AAAA'],
+    [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.com', 'MCAST', 'AZURE', 'LLMNR'],
+    ['200'+random.choice('1234567890abcdef')+'::', random.choice('1234567890abcdef')+'f::fb', 'AKAMAI', 'GOOGLE', 'GCLOUD', 'AMAZON'],
     ['RFC1918', '',''],
     ['', '',''],
     ['', '',''],
@@ -647,22 +640,23 @@ def usage():
 
     print( colored_logo)
 
-    print("""
-
-    Usage: ./ctd [CTD-OPTION] ... [TCPDUMPLIKE-COMMAND + arguments]
-        CTD-OPTION: [--indent INT]
-        TCPDUMPLINE-COMMAND: [ tcpdump / pktmon / tshark / traceroute ]
-
-    Examples:
-        ./ctd tcpdump -lni eth0
-        ./ctd /mnt/c/Windows/System32/PktMon.exe start -c --comp nics -m real-time (In WSL running as Administrator)
-        ./ctd C:\Windows\system32\PktMon.exe start -c --comp nics -m real-time (In native windows running as Administrator)
-
-    """)
+    print( usage_text)
     exit(1)
+
+if len (cmd) == 2 and cmd[1] == '-':
+    print( 'CTD: Reading from stdin ...' )
+    for line in sys.stdin:
+        #print( f'line: {line.rstrip()}')
+        prettify_tcpdump_line_so_it_looks_nice( line.rstrip())
+    exit(0)
 
 if len( cmd) < 2:
     usage()
+
+exit(0)
+
+## Spawning a subprocess seems too much headache compared to simply
+## reading from stdin. Would it ever be worth it?
 
 
 process = subprocess.Popen(

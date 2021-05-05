@@ -1,1 +1,24 @@
-colorful-tcpdump.py
+#!/bin/bash
+
+echo "CTD WRAPPER: script initializing..."
+
+MYDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+CTD_OPTS=""
+
+#SRC_CMD=""
+
+for o in "$@"; do
+	if which "$o" > /dev/null || [ -x "$o" ]; then
+		#"$@"
+		echo "CTD WRAPPER: Found executable for $o, running: $@ | echo $MYDIR/colorful-tcpdump.py $CTD_OPTS"
+		"$@" | $MYDIR/colorful-tcpdump.py $CTD_OPTS -
+		exit $?
+	else
+		# No executable found, assuming it's an CTD option:
+		CTD_OPTS="$CTD_OPTS $o"
+		shift
+	fi
+done
+
+echo "Wrapper script ended without finding a command to execute. Please refer to the usage:"
+$MYDIR/colorful-tcpdump.py 

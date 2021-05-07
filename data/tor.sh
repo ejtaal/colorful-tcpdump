@@ -4,7 +4,7 @@ OUTPUT=02-tor-ctd-data.json
 SOURCE=tor-relays.txt
 # For dev:
 URL="https://onionoo.torproject.org/details?limit=5&fields=or_addresses,city_name,dir_address,running,flags,exit_addresses"
-# For realz:
+# For realzies:
 URL="https://onionoo.torproject.org/details?fields=or_addresses,city_name,dir_address,running,flags,exit_addresses"
 URL="https://onionoo.torproject.org/details?fields=or_addresses,dir_address,running,flags,exit_addresses"
 

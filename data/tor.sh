@@ -10,23 +10,22 @@ URL="https://onionoo.torproject.org/details?fields=or_addresses,dir_address,runn
 
 #wget -O "$SOURCE" "$URL"
 
-jq '.relays | map(select(.flags[] | contains ("Guard"))) | .[] | .or_addresses[], .dir_address, .exit_address' | \
-	perl -p -e 's/]:\d+"],//' | \
-	perl -p -e 's/(\.\d+):\d+"/$1/' | \
-	less
-	#tr -d '"[]{' | cut -f 2 -d: | \
-	#sed -e 's/^/"/' -e 's/$/\/32", "GUARD"
-exit 88
+> /tmp/p
 
-echo -e '\t"TOREXIT": [' | tee "$OUTPUT"
+# https://tor.stackexchange.com/questions/423/what-are-good-explanations-for-relay-flags
+for flag in Guard Exit BadExit Valid Authority; do
+	cat "$SOURCE" | \
+		jq ".relays | map(select(.flags[] | contains (\"$flag\"))) | .[] | .or_addresses[], .dir_address, .exit_address" | \
+		grep -v null | \
+		sort -V | \
+		perl -p -e 's#"([\.\d]+):\d+"#$1/32#' | \
+		perl -p -e 's#"\[([:\.a-f\d]+)\]:\d+"#$1/128#' | \
+		sed "s/\$/ $flag/" | \
+		cat >> /tmp/p
+done
+
+echo -e '\t"TOR": [' | tee "$OUTPUT"
 awk "BEGIN{
 	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
-		{print \"\t[\\\"\" \$0 \"/32\\\", \\\"\\\"]\", ((last==FNR)?\"\n\t]\n\":\",\")}" $SOURCE | \
+		{print \"\t[\\\"\" \$1 \"\\\", \\\"\" \$2 \"\\\"]\", ((last==FNR)?\"\n\t]\n\":\",\")}" /tmp/p | \
 			tee -a "$OUTPUT"
-
-#sed -e "s/^/\t'/" -e "s/$/': '',"
-
-https://onionoo.torproject.org/details?search=running:true
-https://metrics.torproject.org/rs.html#search/running:true%20flag:guard
-https://onionoo.torproject.org/details?search=running:true%20flag:guard
-https://metrics.torproject.org/rs.html#search/running:true%20flag:exit

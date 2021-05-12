@@ -17,3 +17,11 @@ for f in "$@"; do
 	fi
 done
 echo "}" | tee -a "$FINAL_OUTPUT"
+
+# Syntax check it:
+echo "Output file:"
+ls -l "$FINAL_OUTPUT"
+
+echo -n "Syntax check ..."
+jq . < "$FINAL_OUTPUT" > /dev/null && echo OK
+

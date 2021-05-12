@@ -11,4 +11,8 @@ for i in *-ctd-data.json; do
 		perl -p -e 's#\.\d+/\d+#.1#'
 done | \
 	shuf | \
-	xargs -n 1 ping -c 2
+	xargs -n 1 | \
+		while read host; do
+			ping -c 2 $host
+			nc -v -w 3 -z $host 80
+		done

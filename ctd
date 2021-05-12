@@ -8,7 +8,7 @@ CTD_OPTS=""
 #SRC_CMD=""
 
 for o in "$@"; do
-	if which "$o" > /dev/null || [ -x "$o" ]; then
+	if which -- "$o" > /dev/null || [ -x "$o" ]; then
 		#"$@"
 		echo "CTD WRAPPER: Found executable for $o, running: $@ | echo $MYDIR/colorful-tcpdump.py $CTD_OPTS"
 		"$@" | $MYDIR/colorful-tcpdump.py $CTD_OPTS -
@@ -20,5 +20,5 @@ for o in "$@"; do
 	fi
 done
 
-echo "Wrapper script ended without finding a command to execute. Please refer to the usage:"
-$MYDIR/colorful-tcpdump.py 
+# Wrapper script ended without finding a command to execute. Either only CTD options were given or incorrect usage.
+$MYDIR/colorful-tcpdump.py $CTD_OPTS

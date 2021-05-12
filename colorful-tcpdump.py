@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
-usage_text="""
+usage_text_short ="""
+    Usage: ./ctd [CTD-OPTION] ... [TCPDUMPLIKE-COMMAND + arguments]
+    E.g.   ./ctd tcpdump -lni eth0
+
+    --help  Display more help
+"""
+usage_text_full = """
 
     Welcome to Colorful tcpdump!
 
@@ -39,6 +45,9 @@ usage_text="""
     --debug LEVEL
         Also show the original lines before they were mangled by CTD  o_O
         LEVEL can be 1 to 5, the higher, the more verbose
+
+    --info <IP>
+        Tell me what you know about this IP and exit
 
     More examples:
         ./ctd tcpdump -lni eth0
@@ -98,7 +107,80 @@ for ifaceName in interfaces():
                 all_broadcasts.append( value[0]['broadcast'])
 
 
-# TODO: Use colored module for supposedly 256 color support
+##### Nice RGB color generation algos, taken from:
+### https://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors
+
+
+from typing import Iterable, Tuple
+import colorsys
+import itertools
+from fractions import Fraction
+from pprint import pprint
+
+def zenos_dichotomy() -> Iterable[Fraction]:
+    """
+    http://en.wikipedia.org/wiki/1/2_%2B_1/4_%2B_1/8_%2B_1/16_%2B_%C2%B7_%C2%B7_%C2%B7
+    """
+    for k in itertools.count():
+        yield Fraction(1,2**k)
+
+def fracs() -> Iterable[Fraction]:
+    """
+    [Fraction(0, 1), Fraction(1, 2), Fraction(1, 4), Fraction(3, 4), Fraction(1, 8), Fraction(3, 8), Fraction(5, 8), Fraction(7, 8), Fraction(1, 16), Fraction(3, 16), ...]
+    [0.0, 0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875, 0.0625, 0.1875, ...]
+    """
+    yield Fraction(0)
+    for k in zenos_dichotomy():
+        i = k.denominator # [1,2,4,8,16,...]
+        for j in range(1,i,2):
+            yield Fraction(j,i)
+
+# can be used for the v in hsv to map linear values 0..1 to something that looks equidistant
+# bias = lambda x: (math.sqrt(x/3)/Fraction(2,3)+Fraction(1,3))/Fraction(6,5)
+
+HSVTuple = Tuple[Fraction, Fraction, Fraction]
+RGBTuple = Tuple[float, float, float]
+
+def hue_to_tones(h: Fraction) -> Iterable[HSVTuple]:
+    for s in [Fraction(6,10)]: # optionally use range
+        #for v in [Fraction(8,10),Fraction(5,10)]: # could use range too
+        for v in [Fraction(8,10),Fraction(7,10)]: # could use range too
+            yield (h, s, v) # use bias for v here if you use range
+
+def hsv_to_rgb(x: HSVTuple) -> RGBTuple:
+    return colorsys.hsv_to_rgb(*map(float, x))
+
+flatten = itertools.chain.from_iterable
+
+def hsvs() -> Iterable[HSVTuple]:
+    return flatten(map(hue_to_tones, fracs()))
+
+def rgbs() -> Iterable[RGBTuple]:
+    return map(hsv_to_rgb, hsvs())
+
+def rgb_to_css(x: RGBTuple) -> str:
+    #uint8tuple = map(lambda y: int(y*255), x)
+    t = tuple(map(lambda y: int(y*255), x))
+    tup = list(t) + [0]
+    #:w
+    # tup[3] = 0
+    if (0.299 * tup[0] + 0.587 * tup[1] + 0.114 * tup[2])/255 > 0.5:
+        tup[3] = 1
+    
+    return tup
+    #return "rgb({},{},{})".format(*uint8tuple)
+
+def css_colors() -> Iterable[str]:
+    return map(rgb_to_css, rgbs())
+
+
+sample_colors = list(itertools.islice(css_colors(), 100))
+
+#pprint(sample_colors)
+#exit(77)
+
+#####
+
 from colorama import *
 init()
 """
@@ -165,17 +247,30 @@ nice_colors_num = len( nice_colors)
 Z_FORE = 38
 Z_BACK = 48
 
-def _e( color_tuple, z_level=Z_FORE):
+def rgb_ansi( color_tuple, z_level=Z_FORE):
 
 #def _e(red_component, green_component, blue_component, z_level=Z_FORE):
     """Return escaped color sequence"""
-    return '\x01\x1b[{};2;{};{};{}m\x02'.format(
+    z_level = Z_BACK
+
+    ansi = '\x01\x1b[{};2;{};{};{}m\x02'.format(
         z_level, color_tuple[0], color_tuple[1], color_tuple[2])
 
-print( f'{_e( (100,200,255))}Testing')
-print( f'{_e( (110,220,245))}Testing')
-print( f'{_e( (120,210,235))}Testing')
-print( f'{_e( (140,230,215))}Testing')
+    if color_tuple[3] == 1:
+        ansi += Style.BRIGHT + Fore.WHITE
+    else:
+        ansi += '\x01\x1b[{};2;{};{};{}m\x02'.format(
+        Z_FORE, 0,0,0)
+
+    return ansi
+
+#    return '\x01\x1b[{};2;{};{};{}m\x02'.format(
+#        z_level, color_tuple[0], color_tuple[1], color_tuple[2], front_color)
+
+#print( f'{rgb_ansi( (100,200,255))}Testing1')
+#print( f'{rgb_ansi( (110,220,245))}Testing2')
+#print( f'{rgb_ansi( (120,210,235))}Testing3')
+#print( f'{rgb_ansi( (140,230,215))}Testing4')
 
 
 
@@ -209,10 +304,15 @@ for r in color24b_rgb_steps:
     for g in color24b_rgb_steps:
         for b in color24b_rgb_steps:
             if not (r == 0 and r == g and g == b):
-                nice_colors += [( r, g, b)]
+                # If these are taken as background, then calc a suitable foreground:
+                f=1
+                nice_colors += [( r, g, b, f)]
                 #print( f'rgb: {r},{g},{b}')
 
+
+nice_colors = sample_colors
 nice_colors_num = len( nice_colors)
+
 
 
 #print( nice_colors)
@@ -223,12 +323,16 @@ def crc_colorize( s):
     crc = binascii.crc_hqx( s.encode('ascii'), 0)
     #print( s, crc, crc % nice_colors_num)
     #return( nice_colors[ crc % nice_colors_num] + s + Style.RESET_ALL)
-    return( _e( nice_colors[ crc % nice_colors_num]) + s + Style.RESET_ALL)
+    return( rgb_ansi( nice_colors[ crc % nice_colors_num]) + s + Style.RESET_ALL)
 
 #for i in nice_colors:
 #    print( i + "Some text that is supposed to be readable" + Style.RESET_ALL)
 #print(Style.RESET_ALL)
 #print('back to normal now')
+
+#for c in sample_colors:
+#    print( rgb_ansi( c) + "Some text that is supposed to be readable")
+#exit( 88)
 
 print( 'Our network addresses (will be placed on the left):')
 for a in all_adds:
@@ -756,7 +860,14 @@ def usage():
 
     print( colored_logo)
 
-    print( usage_text)
+#    print(cmd)
+    global cmd
+    print(cmd)
+    if len( cmd) > 1 and cmd[1] == '--help':
+        print("MARK")
+        print( usage_text_full)
+    else:
+        print( usage_text_short)
     exit(1)
 
 if len (cmd) == 2 and cmd[1] == '-':
@@ -766,8 +877,9 @@ if len (cmd) == 2 and cmd[1] == '-':
         prettify_tcpdump_line_so_it_looks_nice( line.rstrip())
     exit(0)
 
-if len( cmd) < 2:
-    usage()
+#if len( cmd) < 2 or cmd[1] == '-h' or cmd[1] == '--help':
+# Something didn't go quite right?
+usage()
 
 exit(0)
 

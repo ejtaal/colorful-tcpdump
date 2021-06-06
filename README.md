@@ -10,6 +10,12 @@ A wrapper around tcpump providing pretty colors, extra IP info and more :)
 
 Features:
 
-Features TODO:
-	- Tag everything based on ASN?
-	- Use a more optimized IP lookup module
+TODO:
+	Features
+		- Tag everything based on ASN?
+		- Use a more optimized IP lookup module
+
+	Data
+		- More cloud providers
+		- VPN providers
+		- Internetwide scanners

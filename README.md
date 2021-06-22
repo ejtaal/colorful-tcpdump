@@ -10,6 +10,10 @@ A wrapper around tcpump providing pretty colors, extra IP info and more :)
 
 Features:
 
+INSTALL
+
+pip3 install colorama netifaces maxminddb_geolite2
+
 TODO:
 	Features
 		- Tag everything based on ASN?

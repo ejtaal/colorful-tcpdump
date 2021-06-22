@@ -10,9 +10,11 @@ CTD_OPTS=""
 for o in "$@"; do
 	if which -- "$o" > /dev/null || [ -x "$o" ]; then
 		#"$@"
-		echo "CTD WRAPPER: Found executable for $o, running: $@ | echo $MYDIR/colorful-tcpdump.py $CTD_OPTS"
+		echo "CTD WRAPPER: Found executable for $o, running: $@ | $MYDIR/colorful-tcpdump.py $CTD_OPTS"
+		pushd "$MYDIR"
 		"$@" | $MYDIR/colorful-tcpdump.py $CTD_OPTS -
 		exit $?
+		popd
 	else
 		# No executable found, assuming it's an CTD option:
 		CTD_OPTS="$CTD_OPTS $o"

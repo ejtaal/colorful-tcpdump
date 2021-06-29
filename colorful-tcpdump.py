@@ -173,6 +173,29 @@ def rgb_to_css(x: RGBTuple) -> str:
 def css_colors() -> Iterable[str]:
     return map(rgb_to_css, rgbs())
 
+def rainbowColor( percent_x2):
+    # Based on: https://github.com/gnachman/iTerm2/blob/master/tests/24-bit-color.sh
+    h = int(percent_x2 / 43)
+    f = int(percent_x2 - 43 * h)
+    t = int(f * 255 / 43)
+    q = 255 - t
+    if h == 0:
+        rgb = ( 255, t, 0)
+    if h == 1:
+        rgb = ( q, 255, 0)
+    if h == 2:
+        rgb = ( 0, 255, t)
+    if h == 3:
+        rgb = ( 0, q, 255)
+    if h == 4:
+        rgb = ( t, 0, 255)
+    if h == 5:
+        rgb = ( 255, 0, q)
+    
+    tup = list(rgb) + [0]
+    if (0.299 * tup[0] + 0.587 * tup[1] + 0.114 * tup[2])/255 > 0.5:
+      tup[3] = 1
+    return tup
 
 sample_colors = list(itertools.islice(css_colors(), 100))
 
@@ -254,13 +277,19 @@ def rgb_ansi( color_tuple, z_level=Z_FORE):
     z_level = Z_BACK
 
     ansi = '\x01\x1b[{};2;{};{};{}m\x02'.format(
-        z_level, color_tuple[0], color_tuple[1], color_tuple[2])
+        Z_BACK, color_tuple[0], color_tuple[1], color_tuple[2])
 
     if color_tuple[3] == 1:
         ansi += Style.BRIGHT + Fore.WHITE
-    else:
-        ansi += '\x01\x1b[{};2;{};{};{}m\x02'.format(
+    elif color_tuple[3] == 0:
+        ansi += '\x01\x1b[{};2;{};{};{}m\x02'.format( 
         Z_FORE, 0,0,0)
+    elif color_tuple[3] == 2:
+        ansi = '\x01\x1b[{};2;{};{};{}m\x02'.format(
+          Z_FORE, color_tuple[0], color_tuple[1], color_tuple[2])
+        ansi += '\x01\x1b[{};2;{};{};{}m\x02'.format( 
+          Z_BACK, 0,0,0)
+        
 
     return ansi
 
@@ -307,10 +336,18 @@ for r in color24b_rgb_steps:
                 # If these are taken as background, then calc a suitable foreground:
                 f=1
                 nice_colors += [( r, g, b, f)]
+                nice_colors += [( r, g, b, 2)]
                 #print( f'rgb: {r},{g},{b}')
 
 
 nice_colors = sample_colors
+for col in list(sample_colors):
+  c = list(col)
+  c[3] = 2
+  nice_colors += [ (c[0], c[1], c[2], c[3]) ]
+# add the same ones but with Z = 2 which will be coloured on dark BG
+
+
 nice_colors_num = len( nice_colors)
 
 
@@ -643,6 +680,38 @@ def colorize_matches_within( matchobj):
     
     return s
 
+def rainbow_colorize_value( value, max_value, amplifier = 1):
+    tup = rainbowColor( int(value) * 200 / max_value)
+    if amplifier < 1:
+       #Attenuate the values, will require recalc of foreground colour too
+        tup[0] = int( amplifier * tup[0])
+        tup[1] = int( amplifier * tup[1])
+        tup[2] = int( amplifier * tup[2])
+        tup[3] = 0
+        if (0.299 * tup[0] + 0.587 * tup[1] + 0.114 * tup[2])/255 > 0.5:
+          tup[3] = 1
+
+    tup[3] = 2
+    return tup
+
+      
+
+def colorize_timestamp( matchobj):
+    # Rearrange like so: '\g<1>\g<2>\g<3>.\g<4> '
+    #print( matchobj)
+    color_tup1 = rainbow_colorize_value( matchobj.group(1), 23, 1)
+    color_tup2 = rainbow_colorize_value( matchobj.group(2), 59, 1)
+    color_tup3 = rainbow_colorize_value( matchobj.group(3), 59, 1)
+    color_tup4 = rainbow_colorize_value( matchobj.group(4), 999, 1)
+    #print( rgb_ansi( nice_colors[ crc % nice_colors_num]) + matchobj.group(1) + Style.RESET_ALL)
+    return \
+      rgb_ansi( color_tup1) + matchobj.group(1) +  \
+      rgb_ansi( color_tup2) + matchobj.group(2) +  \
+      rgb_ansi( color_tup3) + matchobj.group(3) + Style.RESET_ALL + \
+      "." + \
+      rgb_ansi( color_tup4) + matchobj.group(4) + Style.RESET_ALL + ' '
+    #exit( 66)
+
 def printn( s):
     print( s, end='')
 
@@ -698,7 +767,8 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
                 + '\g<3>', line)
 
     # Time refix reformatting, works for  pktmon & tcpdump
-    line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', '\g<1>\g<2>\g<3>.\g<4> ', line)
+    #line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', '\g<1>\g<2>\g<3>.\g<4> ', line)
+    line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', colorize_timestamp, line)
 
     # pktmon.exe:
     """

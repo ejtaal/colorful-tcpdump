@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "CTD WRAPPER: script initializing..."
+#echo "CTD WRAPPER: script initializing..."
 
 MYDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 CTD_OPTS=""

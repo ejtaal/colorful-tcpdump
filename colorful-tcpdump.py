@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+### Default values
+debug = False
+nocolor=False
+
+### Nice help text
 usage_text_short ="""
     Usage: ./ctd [CTD-OPTION] ... [TCPDUMPLIKE-COMMAND + arguments]
     E.g.   ./ctd tcpdump -lni eth0
@@ -10,7 +15,7 @@ usage_text_full = """
 
     Welcome to Colorful tcpdump!
 
-    Usage: ./ctd [CTD-OPTION] ... [TCPDUMPLIKE-COMMAND + arguments]
+    Usage: ./ctd [CTD-OPTION] ... [ --info IP | TCPDUMPLIKE-COMMAND + arguments]
         CTD-OPTION: [ --indent INT] [ --detect-local-from-input ]
         TCPDUMPLINE-COMMAND: [ - / tcpdump / pktmon / tshark / traceroute ]
 
@@ -47,10 +52,11 @@ usage_text_full = """
         LEVEL can be 1 to 5, the higher, the more verbose
 
     --info <IP>
-        Tell me what you know about this IP and exit
+        Display what is known about this IP and exit
 
     More examples:
         ./ctd tcpdump -lni eth0
+        ./ctd --info 140.82.121.4
         ./ctd /mnt/c/Windows/System32/PktMon.exe start -c --comp nics -m real-time (In WSL running as Administrator)
         ./ctd C:\Windows\system32\PktMon.exe start -c --comp nics -m real-time (In native windows running as Administrator)
 
@@ -86,31 +92,7 @@ ctd_logo = """
 ####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ######
 """
 
-all_adds = []
-all_broadcasts = []
-all_ifs = []
-
-from netifaces import *
-# TODO: detect running on windows and detect IPs there the right way(tm)
-for ifaceName in interfaces():
-    #all_ifs.append( ifaddresses(ifaceName))
-    for key, value in ifaddresses(ifaceName).items():
-        #print(key, '->', value)
-        all_ifs.append( value)
-        if 'addr' in value[0]:
-            #print( 'addr', value[0]['addr'])
-            if value[0]['addr'] not in all_adds:
-                all_adds.append( value[0]['addr'])
-        if 'broadcast' in value[0]:
-            #print( 'broadcast', value[0]['broadcast'])
-            if value[0]['broadcast'] not in all_broadcasts:
-                all_broadcasts.append( value[0]['broadcast'])
-
-
-##### Nice RGB color generation algos, taken from:
-### https://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors
-
-
+### Set up everything to do with colours. Some of the basic color stuff is no longer used, TODO: remove that
 from typing import Iterable, Tuple
 import colorsys
 import itertools
@@ -200,9 +182,6 @@ def rainbowColor( percent_x2):
 sample_colors = list(itertools.islice(css_colors(), 100))
 
 #pprint(sample_colors)
-#exit(77)
-
-#####
 
 from colorama import *
 init()
@@ -295,10 +274,6 @@ def rgb_ansi( color_tuple, z_level=Z_FORE):
 
 #    return '\x01\x1b[{};2;{};{};{}m\x02'.format(
 #        z_level, color_tuple[0], color_tuple[1], color_tuple[2], front_color)
-
-#print( f'{rgb_ansi( (100,200,255))}Testing1')
-#print( f'{rgb_ansi( (110,220,245))}Testing2')
-#print( f'{rgb_ansi( (120,210,235))}Testing3')
 #print( f'{rgb_ansi( (140,230,215))}Testing4')
 
 
@@ -345,22 +320,20 @@ for col in list(sample_colors):
   c = list(col)
   c[3] = 2
   nice_colors += [ (c[0], c[1], c[2], c[3]) ]
-# add the same ones but with Z = 2 which will be coloured on dark BG
 
 
 nice_colors_num = len( nice_colors)
 
-
-
 #print( nice_colors)
-#exit( 88)
-
 
 def crc_colorize( s):
-    crc = binascii.crc_hqx( s.encode('ascii'), 0)
-    #print( s, crc, crc % nice_colors_num)
-    #return( nice_colors[ crc % nice_colors_num] + s + Style.RESET_ALL)
-    return( rgb_ansi( nice_colors[ crc % nice_colors_num]) + s + Style.RESET_ALL)
+    if nocolor:
+      return( s)
+    else:
+      crc = binascii.crc_hqx( s.encode('ascii'), 0)
+      #print( s, crc, crc % nice_colors_num)
+      #return( nice_colors[ crc % nice_colors_num] + s + Style.RESET_ALL)
+      return( rgb_ansi( nice_colors[ crc % nice_colors_num]) + s + Style.RESET_ALL)
 
 #for i in nice_colors:
 #    print( i + "Some text that is supposed to be readable" + Style.RESET_ALL)
@@ -369,15 +342,77 @@ def crc_colorize( s):
 
 #for c in sample_colors:
 #    print( rgb_ansi( c) + "Some text that is supposed to be readable")
-#exit( 88)
 
-print( 'Our network addresses (will be placed on the left):')
-for a in all_adds:
-    print( crc_colorize( a))
+def usage():
+    colored_logo = ctd_logo
+    colored_logo = re.sub( '([^\s]{1,6})', r, colored_logo)
 
-print( 'Local broadcast addresses:')
-for b in all_broadcasts:
-    print( crc_colorize( b))
+    colored_logo = re.sub( '([^\s]{1,6})', colorize_match, colored_logo)
+    #colored_logo = re.sub( '(_+)', Fore.BLUE + '\g<1>' + Style.RESET_ALL, colored_logo)
+    #colored_logo = re.sub( '_/', f'_{Style.BRIGHT}{Fore.BLUE}/{Style.RESET_ALL}', colored_logo)
+
+    print( colored_logo)
+
+#    print(cmd)
+    global cmd
+    print( cmd)
+    if len( cmd) > 1 and cmd[1] == '--help':
+        print("MARK")
+        print( usage_text_full)
+    else:
+        print( usage_text_short)
+    exit(1)
+
+import argparse
+#parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks', usage=usage())
+parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks')
+parser.add_argument( '--debug', action='store_true')
+parser.add_argument( '--nocolor', action='store_false')
+
+group = parser.add_mutually_exclusive_group( required=True)
+group.add_argument( '--info', metavar='IP', type=str, nargs='?')
+group.add_argument( 'read', metavar='FILE_TO_READ',  type=str, nargs='?')
+
+args = parser.parse_args()
+
+if args.debug:
+  debug = True
+
+if args.nocolor is False:
+  nocolor = True
+
+
+### Get local interface addresses
+
+all_adds = []
+all_broadcasts = []
+all_ifs = []
+
+from netifaces import *
+# TODO: detect running on windows and detect IPs there the right way(tm)
+for ifaceName in interfaces():
+    #all_ifs.append( ifaddresses(ifaceName))
+    for key, value in ifaddresses(ifaceName).items():
+        #print(key, '->', value)
+        all_ifs.append( value)
+        if 'addr' in value[0]:
+            #print( 'addr', value[0]['addr'])
+            if value[0]['addr'] not in all_adds:
+                all_adds.append( value[0]['addr'])
+        if 'broadcast' in value[0]:
+            #print( 'broadcast', value[0]['broadcast'])
+            if value[0]['broadcast'] not in all_broadcasts:
+                all_broadcasts.append( value[0]['broadcast'])
+
+
+if debug:
+  print( 'Our network addresses (will be placed on the left):')
+  for a in all_adds:
+      print( crc_colorize( a))
+
+  print( 'Local broadcast addresses:')
+  for b in all_broadcasts:
+      print( crc_colorize( b))
 
 
 import re
@@ -389,8 +424,9 @@ import threading
 import subprocess
 PIPE = subprocess.PIPE
 
+if debug:
+  print("Argument List:", str(sys.argv))
 
-print("Argument List:", str(sys.argv))
 #cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
 #cmd = ['/sbin/tcpdump', '-lni', 'eth0']
 
@@ -529,14 +565,18 @@ ranges_info = {
 import json
 
 # Opening JSON file
-print("Loading range data...")
+if debug:
+  print("Loading range data...")
 with open('data/ctd-data.json') as json_file:
     data = json.load(json_file)
     for key,value in data.items():
-        print(key)
+        if debug:
+          print( key + ' ', end='')
         ranges_info[ key] = data[ key]
     #pprint( ranges_info)
-print("Done")
+if debug:
+  print('')
+  print("Done")
 
 import ipaddress
 
@@ -649,12 +689,15 @@ def match_dns_info( matchobj):
     #print( f'match_dns() key: [{key}] result: [{result}]')
     if key in dns_cache['queries']:
         domain = dns_cache['queries'][ key]
-        print( f"GOT DNS MATCH: [{domain}] = [{result}]")
+        if debug:
+          print( f"GOT DNS MATCH: [{domain}] = [{result}]")
         if re.search( ", A", result):
-            print(f"We got back multiple matches: {result}")
+            if debug:
+              print(f"We got back multiple matches: {result}")
             results = re.sub( ', A+ ', ',', result)
             for r in results.split(','):
-                print(f"Storing: {r}")
+                if debug:
+                  print(f"Storing: {r}")
                 dns_cache['by_ip'][ r] = domain
         else:
             # Looks to be a response with a single IP only
@@ -731,7 +774,8 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 
 
     if re.search( ' IP6? .*?53(:| >) .* (A|AAAA)', line):
-        print('found DNS!')
+        if debug:
+          print('found DNS!')
         """
 015928.483 IP6 fe80::f405:ed12:ae26:7971.5353 > ff02::fb.5353: 0 A (QM)? wpad.local. (28)
 015928.486 IP6 fe80::f405:ed12:ae26:7971.5353 > ff02::fb.5353: 0 AAAA (QM)? wpad.local. (28)
@@ -904,6 +948,7 @@ def write_output(get):
 """
 
 import random
+### Replace different strings of length 1, 2 .., with the following words:
 tcpdump_logo_strings = [ [], ['>', '+', '.', ':'],
     ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ'],
     ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6', 'TOR'],
@@ -920,62 +965,50 @@ tcpdump_logo_strings = [ [], ['>', '+', '.', ':'],
 def r( o):
     return random.choice( tcpdump_logo_strings[ len( o.group(0))])
 
-def usage():
-    colored_logo = ctd_logo
-    colored_logo = re.sub( '([^\s]{1,6})', r, colored_logo)
 
-    colored_logo = re.sub( '([^\s]{1,6})', colorize_match, colored_logo)
-    #colored_logo = re.sub( '(_+)', Fore.BLUE + '\g<1>' + Style.RESET_ALL, colored_logo)
-    #colored_logo = re.sub( '_/', f'_{Style.BRIGHT}{Fore.BLUE}/{Style.RESET_ALL}', colored_logo)
 
-    print( colored_logo)
+##### Nice RGB color generation algos, taken from:
+### https://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors
 
-#    print(cmd)
-    global cmd
-    print(cmd)
-    if len( cmd) > 1 and cmd[1] == '--help':
-        print("MARK")
-        print( usage_text_full)
-    else:
-        print( usage_text_short)
-    exit(1)
 
-if len (cmd) == 2 and cmd[1] == '-':
-    print( 'CTD: Reading from stdin ...' )
+if args.info:
+    if debug:
+      print( f'Lookup info about {args.info} ...' )
+    print( get_ip_info( args.info))
+    exit(0)
+
+if debug:
+  print( 'read = ', args.read)
+
+if args.read == '-':
+    #print( 'CTD: Reading from stdin ...' )
     for line in sys.stdin:
         #print( f'line: {line.rstrip()}')
         prettify_tcpdump_line_so_it_looks_nice( line.rstrip())
     exit(0)
+else:
+  # Assume it's a file?
+  pass
+
+exit(1)
+
+
+#if len( cmd) == 2 and cmd[1] == '-':
+#    print( 'CTD: Reading from stdin ...' )
+#    for line in sys.stdin:
+#        #print( f'line: {line.rstrip()}')
+#        prettify_tcpdump_line_so_it_looks_nice( line.rstrip())
+#    exit(0)
+#
+#if len( cmd) > 1 and cmd[1] == '--info':
+#    print( f'Lookup info about {cmd[2]} ...' )
+#    print( get_ip_info( cmd[2]))
+#    exit(0)
+#
+#if len
 
 #if len( cmd) < 2 or cmd[1] == '-h' or cmd[1] == '--help':
 # Something didn't go quite right?
 usage()
 
 exit(0)
-
-## Spawning a subprocess seems too much headache compared to simply
-## reading from stdin. Would it ever be worth it?
-
-
-process = subprocess.Popen(
-    cmd, stdout=PIPE, stderr=PIPE, close_fds=True, bufsize=1)
-q = queue.Queue()
-
-tout = threading.Thread(
-    target=read_output, args=(process.stdout, [q.put]))
-terr = threading.Thread(
-    target=read_stderr, args=(process.stderr, [q.put]))
-twrite = threading.Thread(target=write_output, args=(q.get,))
-
-for t in (tout, terr, twrite):
-    t.daemon = True
-    t.start()
-
-process.wait()
-
-for t in (tout, terr):
-    t.join()
-
-q.put(None)
-
-

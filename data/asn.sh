@@ -1,13 +1,17 @@
 #!/bin/bash
 
+. ~/scripts/generic-linux-funcs.sh
+
 # Should end with -ctd-data.json
 # This is one massive convoluted json mess, so can go at the back of
 # the queue for lookups
 OUTPUT=91-asn-ctd-data.json
-SOURCE=ip2asn-combined.tsv.gz
+SOURCE=ip2asn-combined.tsv
 URL="https://iptoasn.com/data/ip2asn-combined.tsv.gz"
 
 # wget -O "$SOURCE" "$URL"
+MAX_CACHE_AGE=$((7*24*60))
+download_if_not_older "$SOURCE" "$MAX_CACHE_AGE" "$URL"
 
 > /tmp/p
 zcat "$SOURCE" | \

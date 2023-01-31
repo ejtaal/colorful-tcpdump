@@ -17,17 +17,24 @@ usage_text_full = """
 
     Usage: ./ctd [CTD-OPTION] ... [ --info IP | TCPDUMPLIKE-COMMAND + arguments]
         CTD-OPTION: [ --indent INT] [ --detect-local-from-input ]
-        TCPDUMPLINE-COMMAND: [ - / tcpdump / pktmon / tshark / traceroute ]
+        TCPDUMPLINE-COMMAND: [ - / tcpdump / pktmon / tshark / traceroute / sshuttle / ...]
 
-    Available CTD-OPTIONs:
+    Available CTD-OPTIONs: (NYI: Not Yet Implemented)
 
-    --indent INT
+    --info <IP>
+        Display what is known about this IP and exit
+
+    --indent INT (NYI)
     -i INT
         indent allput by INT spaces. This allows you to run one ctd in
         the background (e.g. with the & operater in bash), for 
         instance listening on eth0. Then when you open a VPN tunnel,
         run ctd in the foreground with an indent of 4. This should give
         a nice output of external & internal traffic.
+
+    --myip-override IP (or 'IP1 IP2 IP3')
+        Manually set another IP(s) to be considered 'local', which will
+        be placed on the left in CTD's output.
 
     --detect-local-from-input
     -d
@@ -50,9 +57,6 @@ usage_text_full = """
     --debug LEVEL
         Also show the original lines before they were mangled by CTD  o_O
         LEVEL can be 1 to 5, the higher, the more verbose
-
-    --info <IP>
-        Display what is known about this IP and exit
 
     More examples:
         ./ctd tcpdump -lni eth0
@@ -365,9 +369,11 @@ def usage():
 
 import argparse
 #parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks', usage=usage())
-parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks')
+parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and tersely display just a bit more information about the IPs & networks that are seen')
 parser.add_argument( '--debug', action='store_true')
 parser.add_argument( '--nocolor', action='store_false')
+# Note! dashes are converted into underscores else it's not valid python! So it becomes args.myip_override
+parser.add_argument( '--myip-override', metavar='MYIP_OVERRIDE', type=str, nargs='?')
 
 group = parser.add_mutually_exclusive_group( required=True)
 group.add_argument( '--info', metavar='IP', type=str, nargs='?')
@@ -388,21 +394,27 @@ all_adds = []
 all_broadcasts = []
 all_ifs = []
 
-from netifaces import *
-# TODO: detect running on windows and detect IPs there the right way(tm)
-for ifaceName in interfaces():
-    #all_ifs.append( ifaddresses(ifaceName))
-    for key, value in ifaddresses(ifaceName).items():
-        #print(key, '->', value)
-        all_ifs.append( value)
-        if 'addr' in value[0]:
-            #print( 'addr', value[0]['addr'])
-            if value[0]['addr'] not in all_adds:
-                all_adds.append( value[0]['addr'])
-        if 'broadcast' in value[0]:
-            #print( 'broadcast', value[0]['broadcast'])
-            if value[0]['broadcast'] not in all_broadcasts:
-                all_broadcasts.append( value[0]['broadcast'])
+
+if debug:
+    print( args.myip_override)
+if args.myip_override:
+    all_adds = args.myip_override.split( ' ')
+else:
+    from netifaces import *
+    # TODO: detect running on windows and detect IPs there the right way(tm)
+    for ifaceName in interfaces():
+        #all_ifs.append( ifaddresses(ifaceName))
+        for key, value in ifaddresses(ifaceName).items():
+            #print(key, '->', value)
+            all_ifs.append( value)
+            if 'addr' in value[0]:
+                #print( 'addr', value[0]['addr'])
+                if value[0]['addr'] not in all_adds:
+                    all_adds.append( value[0]['addr'])
+            if 'broadcast' in value[0]:
+                #print( 'broadcast', value[0]['broadcast'])
+                if value[0]['broadcast'] not in all_broadcasts:
+                    all_broadcasts.append( value[0]['broadcast'])
 
 
 if debug:
@@ -949,11 +961,11 @@ def write_output(get):
 
 import random
 ### Replace different strings of length 1, 2 .., with the following words:
-tcpdump_logo_strings = [ [], ['>', '+', '.', ':'],
-    ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ'],
+tcpdump_logo_strings = [ [], ['>', '+', '.', ':', '<'],
+    ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ', 'NL', 'DE', 'FR', 'CA', 'CN', 'RU'],
     ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6', 'TOR'],
     ['12'+random.choice('123456789')+'.', '23'+random.choice('123456789')+'.', '[S.]', 'MSFT', 'AAAA'],
-    [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.com', 'MCAST', 'AZURE', 'LLMNR'],
+    [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.net', 'MCAST', 'AZURE', 'LLMNR'],
     ['200'+random.choice('1234567890abcdef')+'::', random.choice('1234567890abcdef')+'f::fb', 'AKAMAI', 'GOOGLE', 'GCLOUD', 'AMAZON'],
     ['RFC1918', '',''],
     ['', '',''],

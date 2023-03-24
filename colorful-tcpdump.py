@@ -3,6 +3,7 @@
 ### Default values
 debug = False
 nocolor=False
+detectlocal = False
 
 ### Nice help text
 usage_text_short ="""
@@ -371,6 +372,8 @@ import argparse
 #parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks', usage=usage())
 parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and tersely display just a bit more information about the IPs & networks that are seen')
 parser.add_argument( '--debug', action='store_true')
+parser.add_argument( '-d', action='store_true')
+parser.add_argument( '--detect-local-from-input', action='store_true')
 parser.add_argument( '--nocolor', action='store_false')
 # Note! dashes are converted into underscores else it's not valid python! So it becomes args.myip_override
 parser.add_argument( '--myip-override', metavar='MYIP_OVERRIDE', type=str, nargs='?')
@@ -387,7 +390,8 @@ if args.debug:
 if args.nocolor is False:
   nocolor = True
 
-
+if args.d or args.detect_local_from_input:
+    detectlocal = True
 ### Get local interface addresses
 
 all_adds = []
@@ -398,7 +402,7 @@ all_ifs = []
 if debug:
     print( args.myip_override)
 if args.myip_override:
-    all_adds = args.myip_override.split( ' ')
+    all_adds = args.myip_override.split(',')
 else:
     from netifaces import *
     # TODO: detect running on windows and detect IPs there the right way(tm)
@@ -572,6 +576,11 @@ ranges_info = {
         ['ff03::c/128', 'SSDP']
     ]
 }
+
+# IPv6 broadcast stuff with local reply?
+#164155.070 IP6 fe80::ffff:ffff:ffff:ffff > ff02::1: HBH ICMP6, multicast listener queryv2  [gaddr ::], length 28
+#164155.079 IP6 fe80::250:56ff:fe86:e146 > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+
 
 # importing the module
 import json
@@ -752,6 +761,7 @@ def rainbow_colorize_value( value, max_value, amplifier = 1):
       
 
 def colorize_timestamp( matchobj):
+    detectlocal = False
     # Rearrange like so: '\g<1>\g<2>\g<3>.\g<4> '
     #print( matchobj)
     color_tup1 = rainbow_colorize_value( matchobj.group(1), 23, 1)
@@ -776,6 +786,42 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
     global pktmon_prefix
     
     #print( f"{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}old:{Style.RESET_ALL}{line}")
+    if detectlocal:
+        """
+        : lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 qdisc noqueue
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast qlen 1000
+    link/ether 00:50:56:86:e1:46 brd ff:ff:ff:ff:ff:ff
+    inet 10.2.2.218/24 brd 10.2.2.255 scope global eth0
+    inet6 fe80::250:56ff:fe86:e146/64 scope link
+       valid_lft forever preferred_lft forever
+3: sit0: <NOARP> mtu 1480 qdisc noop
+    link/sit 0.0.0.0 brd 0.0.0.0
+"""
+        ip_addr_link_local = re.search('\slink/\w+\s+([\d\.a-f:]+)\s', line)
+        ip_addr_ip_local = re.search('\sinet6?\s+([\d\.a-f:]+)\/(\d+)', line)
+        ip_addr_link_or_ip_brd = re.search('\sbrd\s+([\d\.a-f:]+)\s', line)
+        if ip_addr_link_local:
+            # print('IP ADDR LINK:', ip_addr_link_local.group(1))
+            all_adds.append( ip_addr_link_local.group(1))
+        if ip_addr_ip_local:
+            # print('IP ADDR IP:', ip_addr_ip_local.group(1))
+            all_adds.append( ip_addr_ip_local.group(1))
+            # Calculate broadcast just in case, as IPv6 broadcast are not always shown?
+            if re.search(':', ip_addr_ip_local.group(1)):
+                local_net = ipaddress.IPv6Network( ip_addr_ip_local.group(1) + '/' + ip_addr_ip_local.group(2), False)
+            else:
+                local_net = ipaddress.IPv4Network( ip_addr_ip_local.group(1) + '/' + ip_addr_ip_local.group(2), False)
+            all_adds.append( str(local_net.broadcast_address))
+            # print('Broadcast:', local_net.broadcast_address)
+        if ip_addr_link_or_ip_brd:
+            # print('IP ADDR BRD:', ip_addr_link_or_ip_brd.group(1))
+            all_broadcasts.append( ip_addr_link_or_ip_brd.group(1))
+        # line = pktmon_udp_pkt.group(1) + pktmon_udp_pkt.group(2) + pktmon_udp_pkt.group(3)
+
 
     """
     CF +QoS DA:E4-A4-71-B3-75-72 BSSID:80-26-89-AB-D9-84 SA:E4-A4-71-B3-75-72 Data IV:3aaaa Pad 0 KeyID 0

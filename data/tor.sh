@@ -1,5 +1,17 @@
 #!/bin/bash
 
+. ~/scripts/generic-linux-funcs.sh
+
+MAX_CACHE_AGE=$((7*24*60))
+
+DETAILS_OUTPUT="tor-relay-details.txt"
+#DETAILS_URL="https://onionoo.torproject.org/details?running=true&type=relay&fields=country,guard_probability,middle_probability,exit_probability,consensus_weight,consensus_weight_fraction,advertised_bandwidth,flags,as,as_name,measured,version&search=version:0.4.7."
+DETAILS_URL="https://onionoo.torproject.org/details?search=running:true"
+
+download_if_not_older "$DETAILS_OUTPUT" "$MAX_CACHE_AGE" "$DETAILS_URL"
+
+# And now actual CTD data
+
 OUTPUT=02-tor-ctd-data.json
 SOURCE=tor-relays.txt
 # For dev:
@@ -8,9 +20,11 @@ URL="https://onionoo.torproject.org/details?limit=5&fields=or_addresses,city_nam
 URL="https://onionoo.torproject.org/details?fields=or_addresses,city_name,dir_address,running,flags,exit_addresses"
 URL="https://onionoo.torproject.org/details?fields=or_addresses,dir_address,running,flags,exit_addresses"
 
-#wget -O "$SOURCE" "$URL"
+download_if_not_older "$SOURCE" "$MAX_CACHE_AGE" "$URL"
 
 > /tmp/p
+
+
 
 # https://tor.stackexchange.com/questions/423/what-are-good-explanations-for-relay-flags
 for flag in Guard Exit BadExit Valid Authority; do

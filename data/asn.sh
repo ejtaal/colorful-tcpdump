@@ -7,6 +7,7 @@
 # the queue for lookups
 OUTPUT=91-asn-ctd-data.json
 SOURCE=ip2asn-combined.tsv
+SOURCE=ip2asn-combined.tsv.gz
 URL="https://iptoasn.com/data/ip2asn-combined.tsv.gz"
 
 # wget -O "$SOURCE" "$URL"

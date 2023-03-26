@@ -103,6 +103,7 @@ import colorsys
 import itertools
 from fractions import Fraction
 from pprint import pprint
+import re
 
 def zenos_dichotomy() -> Iterable[Fraction]:
     """
@@ -340,6 +341,9 @@ def crc_colorize( s):
       #return( nice_colors[ crc % nice_colors_num] + s + Style.RESET_ALL)
       return( rgb_ansi( nice_colors[ crc % nice_colors_num]) + s + Style.RESET_ALL)
 
+def colorize_match( matchobj):
+    return crc_colorize( matchobj.group(1))
+
 #for i in nice_colors:
 #    print( i + "Some text that is supposed to be readable" + Style.RESET_ALL)
 #print(Style.RESET_ALL)
@@ -348,41 +352,66 @@ def crc_colorize( s):
 #for c in sample_colors:
 #    print( rgb_ansi( c) + "Some text that is supposed to be readable")
 
-def usage():
-    colored_logo = ctd_logo
-    colored_logo = re.sub( '([^\s]{1,6})', r, colored_logo)
+import random
+### Replace different strings of length 1, 2 .., with the following words:
+tcpdump_logo_strings = [ [], ['>', '+', '.', ':', '<'],
+    ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ', 'NL', 'DE', 'FR', 'CA', 'CN', 'RU'],
+    ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6', 'TOR', 'ARP', 'EC2', 'VPN'],
+    ['12'+random.choice('123456789')+'.', '23'+random.choice('123456789')+'.', '[S.]', 'MSFT', 'AAAA', 'http'],
+    [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.net', 'MCAST', 'AZURE', 'LLMNR', 'https'],
+    ['200'+random.choice('1234567890abcdef')+'::', random.choice('1234567890abcdef')+'f::fb', 'AKAMAI', 'GOOGLE', 'GCLOUD', 'AMAZON'],
+    ['RFC1918', '',''],
+    ['', '',''],
+    ['', '',''],
+    ['', '',''],
+    ['', '',''],
+]
 
-    colored_logo = re.sub( '([^\s]{1,6})', colorize_match, colored_logo)
+def gen_random_logo_strings( o):
+    return random.choice( tcpdump_logo_strings[ len( o.group(0))])
+
+def show_logo():
+    colored_logo = ctd_logo
+    
+    colored_logo = re.sub( r'([^\s]{1,6})', gen_random_logo_strings, colored_logo)
+    colored_logo = re.sub( r'([^\s]{1,6})', colorize_match, colored_logo)
     #colored_logo = re.sub( '(_+)', Fore.BLUE + '\g<1>' + Style.RESET_ALL, colored_logo)
     #colored_logo = re.sub( '_/', f'_{Style.BRIGHT}{Fore.BLUE}/{Style.RESET_ALL}', colored_logo)
 
     print( colored_logo)
 
-#    print(cmd)
-    global cmd
-    print( cmd)
-    if len( cmd) > 1 and cmd[1] == '--help':
-        print("MARK")
-        print( usage_text_full)
-    else:
-        print( usage_text_short)
-    exit(1)
+    # global cmd
+    # print(cmd)
+    # print( cmd)
+    # if len( cmd) > 1 and cmd[1] == '--help':
+    #     print("MARK")
+    #     print( usage_text_full)
+    # else:
+    #     print( usage_text_short)
+    # exit(1)
 
 import argparse
 #parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks', usage=usage())
 parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and tersely display just a bit more information about the IPs & networks that are seen')
 parser.add_argument( '--debug', action='store_true')
-parser.add_argument( '-d', action='store_true')
-parser.add_argument( '--detect-local-from-input', action='store_true')
+parser.add_argument( '-d', '--detect-local-from-input', action='store_true')
+# parser.add_argument( '--help', action='store_true')
+#parser.add_argument(  action='store_true')
 parser.add_argument( '--nocolor', action='store_false')
+parser.add_argument( '-nl', "--nologo", help="Skip showing the super cool logo", action="store_true")
+parser.add_argument( '-w', "--wrap", help="Wrap long lines. Default is to cut lines that don't fit in the terminal", action="store_true")
 # Note! dashes are converted into underscores else it's not valid python! So it becomes args.myip_override
 parser.add_argument( '--myip-override', metavar='MYIP_OVERRIDE', type=str, nargs='?')
 
 group = parser.add_mutually_exclusive_group( required=True)
 group.add_argument( '--info', metavar='IP', type=str, nargs='?')
+# group.add_argument( '-u', "--usage", help="usage", action="store_true")
 group.add_argument( 'read', metavar='FILE_TO_READ',  type=str, nargs='?')
 
 args = parser.parse_args()
+
+if not args.nologo:
+  show_logo()
 
 if args.debug:
   debug = True
@@ -390,7 +419,7 @@ if args.debug:
 if args.nocolor is False:
   nocolor = True
 
-if args.d or args.detect_local_from_input:
+if args.detect_local_from_input:
     detectlocal = True
 ### Get local interface addresses
 
@@ -431,7 +460,6 @@ if debug:
       print( crc_colorize( b))
 
 
-import re
 
 import time
 import queue
@@ -439,6 +467,7 @@ import sys
 import threading
 import subprocess
 PIPE = subprocess.PIPE
+import os
 
 if debug:
   print("Argument List:", str(sys.argv))
@@ -704,7 +733,7 @@ def match_dns_info( matchobj):
 04:21:35.711426 IP 172.30.240.1.53 > 172.30.253.88.47204: 20303- 5/0/0 CNAME github.github.io., A 185.199.109.153, A 185.199.108.153, A 185.199.110.153, A 185.199.111.153 (158)
 04:32:36.555860 IP 172.30.240.1.53 > 172.30.253.88.51003: 5787- 6/0/0 A 74.6.231.21, A 74.6.143.25, A 74.6.231.20, A 98.137.11.164, A 98.137.11.163, A 74.6.143.26 (132)
     """
-    print("MARK")
+    # print("MARK")
     key = matchobj.group(2) + matchobj.group(1) + ': ' + matchobj.group(3)
     result = matchobj.group(4)
     #print( f'match_dns() key: [{key}] result: [{result}]')
@@ -732,9 +761,6 @@ def colorize_match_ip( matchobj):
 def colorize_match_ip_port( matchobj):
     #print ( f'asked to colorize: {matchobj.group(0)}/{matchobj.group(1)}/{matchobj.group(2)}]' )
     return crc_colorize( matchobj.group(1)) + ':' + crc_colorize( matchobj.group(2)) + get_ip_info(matchobj.group(1))
-
-def colorize_match( matchobj):
-    return crc_colorize( matchobj.group(1))
 
 def colorize_matches_within( matchobj):
     s = matchobj.group(0)
@@ -843,6 +869,8 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
     dns_query = re.search( '\.(\d+) > (.*?53: \d+).*?\? ([\w\.]+)\.', line)
     if dns_query:
         store_dns_info( dns_query)
+        line = re.sub( '\?\s(.*?)\.\s\(\d+\)', colorize_matches_within, line)
+
 
     """
 02:33:56.598637 IP 1.1.1.1.53 > 172.30.253.88.40418: 909 1/0/0 A 189.113.174.199 (42)
@@ -976,8 +1004,35 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
     line = re.sub( ' < ', Back.BLACK + Style.BRIGHT + Fore.BLUE + ' < ' + Style.RESET_ALL, line)
     #print( "nice: ", line)
 
-    print( line)
-    
+    if args.wrap:
+        print( line)
+    else:
+        terminal_size = os.get_terminal_size()
+        # Print the size
+        # of the terminal
+        linesize_without_ansi = len( ansi_escape.sub('', line))
+        if terminal_size.columns < linesize_without_ansi:
+            # print('CUT')
+            # Assume there's no ansi sequences in the latter part of the string
+            # yes this maybe a gamble but usually it should work
+            cut_line = line[:-(linesize_without_ansi - terminal_size.columns +1 )] + '>'
+            print( cut_line)
+
+    # continue
+    # # print( f"{size} - {linesize_without_ansi}")
+    # print( "-" * linesize_without_ansi)
+    # print( line)
+    # print( '-')
+    # print( repr( ansi_escape.sub('', line)))
+    # print( '-')
+    # print( repr( line))
+
+# regex below adapted from incomplete answer that doesn't address 24bit colors here:
+# https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
+# colored text: 155740.
+# repr() of the above: '\x01\x1b[38;2;0;250;255m\x02\x01\x1b[48;2;0;0;0m\x0215\x01\x1b[38;2;124;0;255m\x02\x01\x1b[48;2;0;0;0m\x0257\x01\x1b[38;2;0;220;255m\x02\x01\x1b[48;2;0;0;0m\x0240\x1b[0m.
+# @-Z = @ plus capitals. 0-? is numbers plus :;<=>?. @-~ is cap and nocapletters plus {}|~
+ansi_escape = re.compile(r'(\x01)?\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])[\x01\x02]*')
 
 def read_stderr(pipe, funcs):
     for line in iter(pipe.readline, ''):
@@ -1005,23 +1060,7 @@ def write_output(get):
 #### main() ###
 """
 
-import random
-### Replace different strings of length 1, 2 .., with the following words:
-tcpdump_logo_strings = [ [], ['>', '+', '.', ':', '<'],
-    ['::', 'A?', 'IP', 'CF', 'US', 'UK', 'AU', 'IE', 'NZ', 'NL', 'DE', 'FR', 'CA', 'CN', 'RU'],
-    ['dns', 'ssh', 'AWS', 'UDP', 'tcp', 'IP6', 'TOR'],
-    ['12'+random.choice('123456789')+'.', '23'+random.choice('123456789')+'.', '[S.]', 'MSFT', 'AAAA'],
-    [ random.choice('abcdef')+'.com', random.choice('abcdef')+'.net', 'MCAST', 'AZURE', 'LLMNR'],
-    ['200'+random.choice('1234567890abcdef')+'::', random.choice('1234567890abcdef')+'f::fb', 'AKAMAI', 'GOOGLE', 'GCLOUD', 'AMAZON'],
-    ['RFC1918', '',''],
-    ['', '',''],
-    ['', '',''],
-    ['', '',''],
-    ['', '',''],
-]
 
-def r( o):
-    return random.choice( tcpdump_logo_strings[ len( o.group(0))])
 
 
 

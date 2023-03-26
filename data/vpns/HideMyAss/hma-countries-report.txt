@@ -1,0 +1,297 @@
+ad,Andorra,VIRTUAL,Andorra la Vella,6
+ae,United Arab Emirates,VIRTUAL,Dubai,6
+af,Afghanistan,VIRTUAL,Kabul,6
+ag,Antigua and Barbuda,VIRTUAL,Saint John's,6
+ai,Anguilla,VIRTUAL,The Valley,6
+al,Albania,VIRTUAL,Tirana,6
+am,Armenia,VIRTUAL,Tsaghkadzor,6
+ao,Angola,VIRTUAL,Luanda,6
+ar,Argentina,VIRTUAL,Buenos Aires,6
+as,American Samoa,VIRTUAL,Pago Pago,6
+at,Austria,PHYSICAL,Vienna,143
+au,Australia,PHYSICAL,Melbourne,110
+au,Australia,PHYSICAL,Perth,33
+au,Australia,PHYSICAL,Sydney,23
+aw,Aruba,VIRTUAL,Palm Beach,6
+ax,Aland Islands,VIRTUAL,Mariehamn,6
+az,Azerbaijan,VIRTUAL,Qusar,6
+ba,Bosnia,VIRTUAL,Sarajevo,6
+bb,Barbados,VIRTUAL,Worthing,6
+bd,Bangladesh,VIRTUAL,Dhaka,6
+be,Belgium,PHYSICAL,Brussels,39
+bf,Burkina Faso,VIRTUAL,Ouagadougou,6
+bg,Bulgaria,VIRTUAL,Sofia,6
+bh,Bahrain,VIRTUAL,Manama,6
+bi,Burundi,VIRTUAL,Bujumbura,6
+bj,Benin,VIRTUAL,Cotonou,6
+bm,Bermuda,VIRTUAL,Hamilton,6
+bn,Brunei,VIRTUAL,Jerudong,6
+bo,Bolivia,VIRTUAL,Santa Cruz,6
+br,Brazil,PHYSICAL,São Paulo,278
+br,Brazil,VIRTUAL,São Paulo,30
+bs,Bahamas,VIRTUAL,Freeport,6
+bt,Bhutan,VIRTUAL,Thimphu,6
+bw,Botswana,VIRTUAL,Gaborone,6
+by,Belarus,VIRTUAL,Minsk,6
+bz,Belize,VIRTUAL,Belize City,6
+ca,Canada,PHYSICAL,Montreal,135
+ca,Canada,PHYSICAL,Toronto,336
+ca,Canada,PHYSICAL,Vancouver,161
+cc,Cocos Islands,VIRTUAL,West Island,6
+cd,Congo,VIRTUAL,Kinshasa,6
+cf,Central African Republic,VIRTUAL,Bangassou,6
+cg,Republic of the Congo,VIRTUAL,Brazzaville,6
+ch,Switzerland,PHYSICAL,Zurich,69
+ci,Cote d`Ivoire,VIRTUAL,Yamoussoukro,6
+ck,Cook Islands,VIRTUAL,Avarua,6
+cl,Chile,VIRTUAL,Santiago,6
+cm,Cameroon,VIRTUAL,Yaounde,6
+cn,China,VIRTUAL,Beijing,12
+co,Colombia,VIRTUAL,San Andres,6
+cr,Costa Rica,VIRTUAL,San José,6
+cu,Cuba,VIRTUAL,Havana,6
+cv,Cape Verde,VIRTUAL,Cidade Velha,6
+cx,Christmas Island,VIRTUAL,Flying Fish Cove,6
+cy,Cyprus,VIRTUAL,Nicosia,6
+cz,Czech Republic,PHYSICAL,Prague,67
+de,Germany,PHYSICAL,Berlin,169
+de,Germany,PHYSICAL,Frankfurt,326
+de,Germany,VIRTUAL,Frankfurt,32
+de,Germany,VIRTUAL,Frankfurt,48
+dj,Republic of Djibouti,VIRTUAL,Djibouti,6
+dk,Denmark,PHYSICAL,Copenhagen,132
+dm,Dominica,VIRTUAL,Marigot,6
+do,Dominican Republic,VIRTUAL,Punta Cana,6
+dz,Algeria,VIRTUAL,Annaba,6
+ec,Ecuador,VIRTUAL,Quito,6
+ee,Estonia,VIRTUAL,Tallinn,6
+eg,Egypt,VIRTUAL,Cairo,6
+er,Eritrea,VIRTUAL,Asmara,6
+es,Spain,PHYSICAL,Barcelona,88
+es,Spain,PHYSICAL,Madrid,142
+et,Ethiopia,VIRTUAL,Gondar,6
+fi,Finland,PHYSICAL,Helsinki,91
+fj,Fiji,VIRTUAL,Nadi,6
+fk,Falkland Islands,VIRTUAL,Stanley,6
+fo,Faroe Islands,VIRTUAL,Torshavn,6
+fr,France,PHYSICAL,Marseille,18
+fr,France,PHYSICAL,Paris,500
+ga,Gabon,VIRTUAL,Libreville,6
+gb,UK,VIRTUAL,Donkey Town,20
+gb,UK,PHYSICAL,Glasgow,143
+gb,UK,PHYSICAL,London,336
+gb,UK,VIRTUAL,London,6
+gb,UK,VIRTUAL,London,6
+gd,Grenada,VIRTUAL,Saint George,6
+ge,Georgia,VIRTUAL,Tbilisi,6
+gh,Ghana,VIRTUAL,Accra,6
+gi,Gibraltar,VIRTUAL,Catalan,6
+gl,Greenland,VIRTUAL,Ilulissat,6
+gm,Gambia,VIRTUAL,Serekunda,6
+gn,Guinea,VIRTUAL,Conakry,6
+gp,Guadeloupe,VIRTUAL,Le Gosier,6
+gq,Equatorial Guinea,VIRTUAL,Malabo,6
+gr,Greece,VIRTUAL,Athens,6
+gt,Guatemala,VIRTUAL,Guatemala City,6
+gu,Guam,VIRTUAL,Tamuning,6
+gw,Guinea-Bissau,VIRTUAL,Bissau,6
+gy,Guyana,VIRTUAL,Barima-Waini,6
+hn,Honduras,VIRTUAL,Tegucigalpa,6
+hr,Croatia,VIRTUAL,Zagreb,6
+ht,Haiti,VIRTUAL,Cap-Haitien,6
+hu,Hungary,PHYSICAL,Budapest,88
+id,Indonesia,VIRTUAL,Jakarta,6
+ie,Ireland,PHYSICAL,Dublin,82
+il,Israel,PHYSICAL,Tel Aviv,44
+in,India,VIRTUAL,Mumbai,6
+iq,Iraq,VIRTUAL,Baghdad,6
+ir,Iran,VIRTUAL,Isfahan,6
+is,Iceland,PHYSICAL,Reykjavik,27
+it,Italy,PHYSICAL,Milan,135
+jm,Jamaica,VIRTUAL,Montego Bay,6
+jo,Jordan,VIRTUAL,Amman,6
+jp,Japan,PHYSICAL,Tokyo,41
+ke,Kenya,VIRTUAL,Nairobi,6
+kg,Kyrgyzstan,VIRTUAL,Bishkek,6
+kh,Cambodia,VIRTUAL,Phnom Penh,6
+ki,Kiribati,VIRTUAL,Umwa Village,6
+km,Comoros,VIRTUAL,Ouani,6
+kn,Saint Kitts and Nevis,VIRTUAL,Basseterre,6
+kp,North Korea,VIRTUAL,Manpo,6
+kr,South Korea,PHYSICAL,Seoul,66
+kw,Kuwait,VIRTUAL,Kuwait City,6
+ky,Cayman Islands,VIRTUAL,Spot Bay,6
+kz,Kazakhstan,VIRTUAL,Shymkent,6
+la,Laos,VIRTUAL,Thakhek,6
+lb,Lebanon,VIRTUAL,Beirut,6
+lc,Saint Lucia,VIRTUAL,Gros Islet,6
+li,Liechtenstein,VIRTUAL,Vaduz,6
+lk,Sri Lanka,VIRTUAL,Moratuwa,6
+lr,Liberia,VIRTUAL,Monrovia,6
+ls,Lesotho,VIRTUAL,Peka,6
+lt,Lithuania,VIRTUAL,Siauliai,6
+lt,Lithuania,PHYSICAL,Vilnius,26
+lu,Luxembourg,PHYSICAL,Luxembourg,39
+lv,Latvia,PHYSICAL,Riga,32
+ly,Libya,VIRTUAL,Ghadames,6
+ma,Morocco,VIRTUAL,Fes,6
+mc,Monaco,VIRTUAL,Monaco,6
+md,Moldova,VIRTUAL,Chisinau,6
+me,Montenegro,VIRTUAL,Becici,6
+mg,Madagascar,VIRTUAL,Antsiranana,6
+mk,North Macedonia,VIRTUAL,Skopje,6
+ml,Mali,VIRTUAL,Bamako,6
+mm,Myanmar,VIRTUAL,Yangon,6
+mn,Mongolia,VIRTUAL,Suhbaatar,6
+mo,Macau,VIRTUAL,Macau,6
+mr,Mauritania,VIRTUAL,Nouakchott,6
+ms,Montserrat,VIRTUAL,Plymouth,6
+mt,Malta,VIRTUAL,Cospicua,6
+mu,Mauritius,VIRTUAL,Port Louis,6
+mv,Maldives,VIRTUAL,Male,6
+mw,Malawi,VIRTUAL,Lilongwe,6
+mx,Mexico,PHYSICAL,Mexico City,52
+my,Malaysia,PHYSICAL,Johor Bahru,64
+mz,Mozambique,VIRTUAL,Pemba,6
+na,Namibia,VIRTUAL,Windhoek,6
+nc,New Caledonia,VIRTUAL,Noumea,6
+ne,Niger,VIRTUAL,Niamey,6
+nf,Norfolk Island,VIRTUAL,Kingston,6
+ng,Nigeria,VIRTUAL,Lagos,6
+ni,Nicaragua,VIRTUAL,Managua,6
+nl,Netherlands,PHYSICAL,Amsterdam,113
+nl,Netherlands,VIRTUAL,Amsterdam,16
+no,Norway,PHYSICAL,Oslo,210
+np,Nepal,VIRTUAL,Janakpur,6
+nr,Nauru,VIRTUAL,Anabar,6
+nu,Niue,VIRTUAL,Alofi,6
+nz,New Zealand,PHYSICAL,Auckland,44
+om,Oman,VIRTUAL,Salalah,6
+pa,Panama,VIRTUAL,Panama City,6
+pe,Peru,VIRTUAL,Cusco,6
+pg,Papua New Guinea,VIRTUAL,Alotau,6
+ph,Philippines,VIRTUAL,Baguio,11
+pk,Pakistan,VIRTUAL,Karachi,6
+pl,Poland,PHYSICAL,Warsaw,66
+pm,Saint Pierre and Miquelon,VIRTUAL,Saint-Pierre,6
+pn,Pitcairn Islands,VIRTUAL,Adamstown,6
+pr,Puerto Rico,VIRTUAL,San Juan,6
+ps,Palestine,VIRTUAL,Bethlehem,6
+pt,Portugal,PHYSICAL,Leiria,119
+pw,Palau,VIRTUAL,Melekeok,6
+py,Paraguay,VIRTUAL,Boqueron,6
+qa,Qatar,VIRTUAL,Doha,6
+ro,Romania,VIRTUAL,Bucharest,6
+rs,Serbia,VIRTUAL,Belgrade,6
+rw,Rwanda,VIRTUAL,Kigali,6
+sa,Saudi Arabia,VIRTUAL,Riyadh,6
+sb,Solomon Islands,VIRTUAL,Honiara,6
+sd,Sudan,VIRTUAL,Khartoum,6
+se,Sweden,PHYSICAL,Stockholm,104
+sg,Republic of Singapore,PHYSICAL,Singapore,65
+sg,Republic of Singapore,VIRTUAL,Singapore,32
+sg,Republic of Singapore,VIRTUAL,Singapore,32
+sg,Republic of Singapore,VIRTUAL,Singapore,64
+sg,Republic of Singapore,VIRTUAL,Singapore,96
+sh,Saint Helena,VIRTUAL,Tristan da Cunha,6
+si,Slovenia,VIRTUAL,Vrhnika,6
+sj,Svalbard and Jan Mayen,VIRTUAL,Longyearbyen,6
+sk,Slovakia,VIRTUAL,Bratislava,6
+sl,Sierra Leone,VIRTUAL,Freetown,6
+sm,San Marino,VIRTUAL,San Marino,6
+sn,Senegal,VIRTUAL,Dakar,6
+so,Somalia,VIRTUAL,Afgooye,6
+sr,Suriname,VIRTUAL,Paramaribo,6
+st,Sao Tome and Principe,VIRTUAL,Sao Tome,6
+sv,El Salvador,VIRTUAL,San Miguel,6
+sy,Syria,VIRTUAL,Ad Darah,6
+sz,Eswatini,VIRTUAL,Manzini,6
+tc,Turks and Caicos Islands,VIRTUAL,Balfour Town,6
+td,Chad,VIRTUAL,N'Djamena,6
+tg,Togo,VIRTUAL,Lome,6
+th,Thailand,VIRTUAL,Bangkok,6
+tj,Tajikistan,VIRTUAL,Dushanbe,6
+tk,Tokelau,VIRTUAL,Atafu,6
+tm,Turkmenistan,VIRTUAL,Ashgabat,6
+tn,Tunisia,VIRTUAL,Mahdia,6
+to,Tonga,VIRTUAL,Nukualofa,6
+tr,Turkey,PHYSICAL,Istanbul,39
+tt,Trinidad and Tobago,VIRTUAL,San Fernando,6
+tv,Tuvalu,VIRTUAL,Vaitupu,6
+tw,Taiwan,PHYSICAL,Taipei,88
+tz,Tanzania,VIRTUAL,Arusha,6
+ua,Ukraine,VIRTUAL,Kyiv,30
+ua,Ukraine,VIRTUAL,Odessa,6
+ug,Uganda,VIRTUAL,Kampala,6
+us,USA,VIRTUAL,Anchorage,6
+us,USA,VIRTUAL,Montgomery,22
+us,USA,VIRTUAL,Magnolia,9
+us,USA,PHYSICAL,Phoenix,342
+us,USA,PHYSICAL,Los Angeles,210
+us,USA,PHYSICAL,San Jose,145
+us,USA,VIRTUAL,Trumbull,19
+us,USA,PHYSICAL,Washington DC,302
+us,USA,VIRTUAL,Wilmington,6
+us,USA,PHYSICAL,Jacksonville,90
+us,USA,PHYSICAL,Miami,112
+us,USA,PHYSICAL,Atlanta,199
+us,USA,PHYSICAL,Honolulu,39
+us,USA,VIRTUAL,Des Moines,12
+us,USA,VIRTUAL,Idaho Falls,9
+us,USA,PHYSICAL,Chicago,256
+us,USA,PHYSICAL,South Bend,22
+us,USA,VIRTUAL,Wichita,9
+us,USA,VIRTUAL,Louisville,12
+us,USA,VIRTUAL,New Orleans,12
+us,USA,PHYSICAL,Boston,100
+us,USA,VIRTUAL,Baltimore,6
+us,USA,VIRTUAL,Bath,6
+us,USA,VIRTUAL,Lansing,6
+us,USA,VIRTUAL,Saint Paul,9
+us,USA,PHYSICAL,St. Louis,22
+us,USA,VIRTUAL,Jackson,6
+us,USA,VIRTUAL,Billings,9
+us,USA,PHYSICAL,Asheville,50
+us,USA,VIRTUAL,Grand Forks,9
+us,USA,VIRTUAL,Omaha,9
+us,USA,VIRTUAL,Bedford,9
+us,USA,PHYSICAL,Las Vegas,94
+us,USA,PHYSICAL,Liberty Island,29
+us,USA,PHYSICAL,New York,212
+us,USA,VIRTUAL,New York,6
+us,USA,VIRTUAL,New York,22
+us,USA,VIRTUAL,New York,16
+us,USA,VIRTUAL,New York,22
+us,USA,PHYSICAL,Columbus,0
+us,USA,PHYSICAL,Oklahoma City,8
+us,USA,VIRTUAL,Portland,9
+us,USA,VIRTUAL,Scranton,6
+us,USA,VIRTUAL,Providence,6
+us,USA,VIRTUAL,Columbia,6
+us,USA,VIRTUAL,Sioux Falls,6
+us,USA,VIRTUAL,Nashville,6
+us,USA,PHYSICAL,Dallas,123
+us,USA,PHYSICAL,Salt Lake City,62
+us,USA,PHYSICAL,Ashburn,42
+us,USA,VIRTUAL,Rutland,6
+us,USA,PHYSICAL,Seattle,334
+us,USA,PHYSICAL,Madison,8
+us,USA,VIRTUAL,Philippi,6
+us,USA,VIRTUAL,Cheyenne,6
+uy,Uruguay,VIRTUAL,Montevideo,6
+uz,Uzbekistan,VIRTUAL,Samarkand,6
+va,Vatican,VIRTUAL,Vatican City,6
+vc,Saint Vincent and the Grenadines,VIRTUAL,Kingstown,6
+ve,Venezuela,VIRTUAL,Caracas,6
+vg,British Virgin Islands,VIRTUAL,Tortola,6
+vn,Vietnam,VIRTUAL,Ho Chi Minh City,6
+vu,Vanuatu,VIRTUAL,Loltong,6
+ws,Samoa,VIRTUAL,Matatufu,6
+ye,Yemen,VIRTUAL,Sanaa,6
+za,South Africa,PHYSICAL,Johannesburg,59
+za,South Africa,VIRTUAL,Johannesburg,30
+za,South Africa,VIRTUAL,Johannesburg,30
+za,South Africa,VIRTUAL,Johannesburg,30
+za,South Africa,VIRTUAL,Johannesburg,30
+zm,Zambia,VIRTUAL,Lusaka,6
+zw,Zimbabwe,VIRTUAL,Harare,6

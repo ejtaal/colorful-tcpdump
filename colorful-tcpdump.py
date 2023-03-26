@@ -974,7 +974,7 @@ def r( o):
 if args.info:
     if debug:
       print( f'Lookup info about {args.info} ...' )
-    print( get_ip_info( args.info))
+    print( get_ip_info( args.info).lstrip())
     exit(0)
 
 if debug:

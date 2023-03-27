@@ -1,34 +1,45 @@
 #!/bin/bash
 
+. ~/scripts/generic-linux-funcs.sh
+
 # Should end with -ctd-data.json
 OUTPUT=08-gcloud-ctd-data.json
 SOURCE=gcloud-ipranges.txt
 URL="https://www.gstatic.com/ipranges/cloud.json"
 
 #wget -O "$SOURCE" "$URL"
+MAX_CACHE_AGE=$((7*24*60))
+download_if_not_older "$SOURCE" "$MAX_CACHE_AGE" "$URL"
+
+TEMPFILE="/tmp/goog-parse.XXX"
 
 grep '/' "$SOURCE" | \
 	tr -d ',' | \
 	awk '{ print $2 ", \"\"" }' | \
-	sort -uV | \
-	tee /tmp/p
+	sort -uV \
+	| cat > "$TEMPFILE"
 
-echo -e '\t"GCLOUD": [' | tee "$OUTPUT"
+echo -e '\t"GCLOUD": [' > "$OUTPUT"
 awk 'BEGIN{
 	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
-	{print "\t[" $0 "]", ((last==FNR) ? "\n\t]\n" :",")}' /tmp/p | \
-		tee -a "$OUTPUT"
+	{print "\t[" $0 "]", ((last==FNR) ? "\n\t]\n" :",")}' "$TEMPFILE" \
+	| cat >> "$OUTPUT"
 
+ls -l "$OUTPUT"
+head -3 "$OUTPUT"
+echo ...
+tail -3 "$OUTPUT"
+rm -f "$TEMPFILE"
 #jq '.values[].properties | . as $line | .addressPrefixes[] as $a | [$a, $line.systemService] | @tsv' < azure-ipranges.txt | \
 #	sed -e 's/\\tAzure/\\t/' -e 's/\\t/": "/' | \
 #	sort -uV | \
-#	tee /tmp/p
+#	tee "$TEMPFILE"
 #	#tr -d '"' | \
 #
 #jq '.values[].properties | . as $line | .addressPrefixes[] as $a | [$a, $line.region] | @tsv' < azure-ipranges.txt | \
 #	sed -e 's/\\tAzure/\\t/' -e 's/\\t/": "/' | \
 #	sort -uV | \
-#	tee -a /tmp/p
+#	tee -a "$TEMPFILE"
 #
 #awk "BEGIN{
 #	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
@@ -36,9 +47,9 @@ awk 'BEGIN{
 #			tee -a "$OUTPUT"
 
 #jq '.prefixes[] | [.ip_prefix, .service] | @tsv' < aws-ipranges.txt | \
-#	sed -e 's/\\t/": "/' > /tmp/p
+#	sed -e 's/\\t/": "/' > "$TEMPFILE"
 #
 #jq '.prefixes[] | [.ip_prefix, .region] | @tsv' < aws-ipranges.txt | \
-#	sed -e 's/\\t/": "/' >> /tmp/p
+#	sed -e 's/\\t/": "/' >> "$TEMPFILE"
 #
 

@@ -15,6 +15,7 @@ Please see the feature list below.
 - color code IPs, port numbers, and other interesting meta info found within or added to the output.
 - provide meta information along with each IP in the output. This includes country code and other info gained from public sources, such as TOR status, ASN info, cloud provider meta info, etc. Again this is colour coded.
 - When a DNS query is performed the results are cached. If an IP is subsequently seen that matches some of the resolved IPs replace it with the name that was searched for. This is a bit more intelligent than doing dumb reverse IP lookups that would often yield unhelpful results. Note this doesn't work with `tcpdump -q ...` as this doesn't print the full DNS query and results.
+- cuts off long lines when they don't fit in the terminal by default (and supports terminal resizing), but has an option to wrap them instead also.
 - time stamps colorized in a rolling rainbow just because we can :)
 
 # Why?

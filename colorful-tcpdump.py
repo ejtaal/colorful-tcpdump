@@ -410,7 +410,7 @@ group.add_argument( 'read', metavar='FILE_TO_READ',  type=str, nargs='?')
 
 args = parser.parse_args()
 
-if not args.nologo:
+if not args.nologo and not args.info:
   show_logo()
 
 if args.debug:

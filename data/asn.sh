@@ -73,6 +73,10 @@ extract_asn ONEWEB "ONEWEB"
 extract_asn SPACEX "SPACEX-STARLINK"
 extract_asn AKAMAI "AKAMAI"
 
+ls -l "$OUTPUT"
+head -3 "$OUTPUT"
+echo ...
+tail -3 "$OUTPUT"
 rm -f "$TEMPFILE"
 
 # TODO: Now do the same for collections of:

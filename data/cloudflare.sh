@@ -21,12 +21,21 @@ download_if_not_older "$SOURCE" "$MAX_CACHE_AGE" "$URL"
 
 TEMPFILE="/tmp/cf-parse.XXX"
 
-cat cf-ips-v?.txt > "$TEMPFILE"
+cat cf-ips-v4.txt > "$TEMPFILE"
+echo >> "$TEMPFILE"
+cat cf-ips-v6.txt >> "$TEMPFILE"
 
 echo -e '\t"CF": [' | tee "$OUTPUT"
 awk "BEGIN{
 	while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
 		{print \"\t[\\\"\" \$0 \"\\\", \\\"\\\"]\", ((last==FNR)?\"\n\t]\n\":\",\")}" "$TEMPFILE" | \
 			tee -a "$OUTPUT"
+
+ls -l "$OUTPUT"
+head -3 "$OUTPUT"
+echo ...
+tail -3 "$OUTPUT"
+rm -f "$TEMPFILE"
+
 
 #sed -e "s/^/\t'/" -e "s/$/': '',"

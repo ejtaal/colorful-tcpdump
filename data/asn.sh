@@ -71,6 +71,7 @@ head -20 "$FREQ_REPORT"
 extract_asn OVH 'OVH$'
 extract_asn ONEWEB "ONEWEB"
 extract_asn SPACEX "SPACEX-STARLINK"
+extract_asn MOZILLA "MOZILLA"
 extract_asn AKAMAI "AKAMAI"
 
 ls -l "$OUTPUT"

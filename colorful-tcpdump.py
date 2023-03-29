@@ -392,21 +392,23 @@ def show_logo():
 
 import argparse
 #parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks', usage=usage())
-parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and tersely display just a bit more information about the IPs & networks that are seen')
-parser.add_argument( '--debug', action='store_true')
-parser.add_argument( '-d', '--detect-local-from-input', action='store_true')
-# parser.add_argument( '--help', action='store_true')
-#parser.add_argument(  action='store_true')
-parser.add_argument( '--nocolor', action='store_false')
-parser.add_argument( '-nl', "--nologo", help="Skip showing the super cool logo", action="store_true")
-parser.add_argument( '-w', "--wrap", help="Wrap long lines. Default is to cut lines that don't fit in the terminal", action="store_true")
-# Note! dashes are converted into underscores else it's not valid python! So it becomes args.myip_override
-parser.add_argument( '--myip-override', metavar='MYIP_OVERRIDE', type=str, nargs='?')
+parser = argparse.ArgumentParser( description='A script to prettify tcpdump output with colours, add extra info regarding IPs seen, and add some other enhancements to the output.')
 
 group = parser.add_mutually_exclusive_group( required=True)
-group.add_argument( '--info', metavar='IP', type=str, nargs='?')
+group.add_argument( '--info', metavar='IP', type=str, nargs=1, help='Tell me what you know about this IP and then quit.')
 # group.add_argument( '-u', "--usage", help="usage", action="store_true")
-group.add_argument( 'read', metavar='FILE_TO_READ',  type=str, nargs='?')
+group.add_argument( 'read', metavar='TCPDUMP_LIKE_CMD',  type=str, nargs='?', help='The command to run, from which output is read and colorized. This is assumed to be tcpdump or similar (support for others is TODO)')
+
+parser.add_argument( '-d', '--detect-local-from-input', action='store_true', help='Do not detect local interfaces in code, but detect them from running e.g. `ip addr` prior to the tcpdump command. This is useful for when output is read from a remote ssh tcpdump command instead of a locally running one, e.g. `./ctd -d ssh "ip addr; tcpdump -qlni eth0"`')
+# parser.add_argument( '--help', action='store_true')
+#parser.add_argument(  action='store_true')
+parser.add_argument( '-w', "--wrap", help="Wrap long lines. Default is to cut lines that don't fit in the terminal", action="store_true")
+parser.add_argument( '--nocolor', action='store_false', help='Do away with all the eye candy colors!. Use this in scripts when you just want to capture plain text info without all the ANSI color sequences.')
+parser.add_argument( '-nl', "--nologo", help="Skip showing the super cool logo", action="store_true")
+# Note! dashes are converted into underscores else it's not valid python! So it becomes args.myip_override
+parser.add_argument( '--myip-override', metavar='IP', type=str, nargs=1, help='set a local IP manually')
+
+parser.add_argument( '--debug', action='store_true', help='Print way more debugging info.')
 
 args = parser.parse_args()
 

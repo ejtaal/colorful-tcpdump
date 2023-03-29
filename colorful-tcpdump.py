@@ -617,6 +617,9 @@ ranges_info = {
 
 # importing the module
 import json
+import radix
+
+rtree = radix.Radix()
 
 # Opening JSON file
 if debug:
@@ -627,6 +630,42 @@ with open('data/ctd-data.json') as json_file:
         if debug:
           print( key + ' ', end='')
         ranges_info[ key] = data[ key]
+        for subnet,info in data[ key]:
+            # if debug:
+            #     print( f"{key}: {subnet}/{info}")
+            # # Adding a node returns a RadixNode object. You can create
+            # # arbitrary members in its 'data' dict to store your data
+            # rnode = rtree.add("10.0.0.0/8")
+            # rnode.data["blah"] = "whatever you want"
+            # if subnet == '146.59.44.45/32':
+            #     continue
+
+            rnode = rtree.search_exact( subnet)
+            if rnode:
+                # print('Seen already: ', rnode.data)
+                if key in rnode.data:
+                    if info in rnode.data[ key]:
+                        continue
+                    else:
+                        rnode.data[ key].append( info)
+                else:
+                    rnode.data[key] = [info]
+                    # print( rnode.data)
+                # if subnet == "146.59.0.0/16":
+                #     print( rnode.data)
+                #     # exit(7)
+            else:
+                # Not present yet, adding it
+                rnode = rtree.add( subnet)
+                rnode.data[key] = [info]
+
+            # if subnet == "146.59.0.0/16":
+            #     print( rnode.prefix)
+            #     print( rnode.data)
+                # exit(7)
+            
+    # exit(9)
+
     #pprint( ranges_info)
 if debug:
   print('')
@@ -664,33 +703,40 @@ def get_ip_info( ip):
     if info != "":
         info = f'[{info}]'
 
-    for descr in ranges_info.keys():
-        moreinfo = []
-        return_info = ""
-        #print( 'descr: ', descr)
-        for tup in ranges_info[ descr]:
-            r = tup[0]
-            rinfo = tup[1]
-            #pprint( r)
-            found=False
-            if ':' not in ip and ':' not in r:
-                if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):
-                    found=True
-                    #print( 'Found ', ip, ' in range ', r, ' which is ', crc_colorize( rinfo))
-            elif ':' in ip and ':' in r:
-                if ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
-                    found=True
-#            if ip.search('\.') and ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r)
-#            or ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
-                #print( 'ip is in net', ip, r)
-            if found:
-                moreinfo += [rinfo]
+    # # Covered search will return all prefixes inside the given
+    # # search term, as a list (including the search term itself,
+    # # if present in the tree)
+    # rnodes = rtree.search_covered("10.123.0.0/16")
 
-        #print( 'moreinfo: ', moreinfo)
-        if len(moreinfo) > 0:
+    # Note: covered()  returns nodes that the search term covers or equals
+    #       covering() returns nodes that encompass the search term or equal it
+    rnodes = rtree.search_covering( ip)
+    if rnodes:
+        # First gather all data from the relevant nodes:
+        moreinfo = {}
+        for rnode in rnodes:
+            if debug:
+                print( rnode.prefix)
+                print( rnode.data)
+            for key in rnode.data:
+                for value in rnode.data[key]:
+                    # if value != '':
+                    if key in moreinfo:
+                        moreinfo[ key].append( value)
+                    else:
+                        moreinfo[ key] = [ value]
+
+    # rnodes = rtree.search_covered( ip)
+    # for rnode in rnodes:
+    #     print( rnode.prefix)
+    #     print( rnode.data)
+        # print( 'moreinfo: ', moreinfo)
+
+        # if len(moreinfo) > 0:
+        for descr in moreinfo.keys():
             addinfo = crc_colorize( descr)
             seen = []
-            for i in moreinfo:
+            for i in moreinfo[ descr]:
                 #print( 'i: ', i)
                 #print( 'seen: ', seen)
                 #if i in seen:
@@ -703,6 +749,9 @@ def get_ip_info( ip):
                 seen += [i]
             info += f'[{addinfo}]'
 
+        # print( 'info: ', info)
+        # exit(8)
+
     # Don't look up this ip again
     info_cache[ip] = info
 
@@ -711,6 +760,57 @@ def get_ip_info( ip):
 
     # Else nothing to report but DNS (if any found)
     return dnsinfo
+
+#     # The old barbaric way of looking up things:
+#     for descr in ranges_info.keys():
+#         moreinfo = []
+#         return_info = ""
+#         #print( 'descr: ', descr)
+#         for tup in ranges_info[ descr]:
+#             r = tup[0]
+#             rinfo = tup[1]
+#             #pprint( r)
+#             found=False
+#             if ':' not in ip and ':' not in r:
+#                 if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):
+#                     found=True
+#                     #print( 'Found ', ip, ' in range ', r, ' which is ', crc_colorize( rinfo))
+#             elif ':' in ip and ':' in r:
+#                 if ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
+#                     found=True
+# #            if ip.search('\.') and ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r)
+# #            or ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
+#                 #print( 'ip is in net', ip, r)
+#             if found:
+#                 moreinfo += [rinfo]
+
+#         #print( 'moreinfo: ', moreinfo)
+#         if len(moreinfo) > 0:
+#             addinfo = crc_colorize( descr)
+#             seen = []
+#             for i in moreinfo:
+#                 #print( 'i: ', i)
+#                 #print( 'seen: ', seen)
+#                 #if i in seen:
+#                 #    print('i in seen?')
+#                 #else:
+#                 #    print('i NOT in seen?')
+#                 if i not in seen and i != "":
+#                     addinfo += '/' + crc_colorize( i)
+#                     #print( 'addinfo: ', addinfo)
+#                 seen += [i]
+#             info += f'[{addinfo}]'
+
+
+
+#     # Don't look up this ip again
+#     info_cache[ip] = info
+
+#     if info != "":
+#         return dnsinfo + " " + info
+
+#     # Else nothing to report but DNS (if any found)
+#     return dnsinfo
 
 
 dns_cache= {}
@@ -1080,8 +1180,7 @@ if args.info:
       if ip == '0.0.0.0':
         print("Benchmarking...")
         """
-        Prior to py-radix use, with plain "if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):" lookups, 625 IP lookups took 
-
+        Prior to py-radix use, with plain "if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):" lookups, 576 IP lookups took 
 
 4179521270 function calls (4179419383 primitive calls) in 1165.928 seconds
    Ordered by: standard name                                                                                 ncalls  tottime  percall  cumtime  percall filename:lineno(function)            
@@ -1108,6 +1207,42 @@ if args.info:
  70831872   28.836    0.000   35.714    0.000 ipaddress.py:739(__contains__)
  ...
  etc
+
+ Using py-radix:
+
+    return dnsinfo
+        429180 function calls (327293 primitive calls) in 0.167 seconds                                                           
+                                                                                                                                   
+   Ordered by: standard name                                                                                                       
+                                                                                                                                   
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)                                                            
+        1    0.000    0.000    0.000    0.000 cProfile.py:117(__exit__)                                                            
+     1123    0.001    0.000    0.002    0.000 colorful-tcpdump.py:258(rgb_ansi)                                                    
+     1123    0.001    0.000    0.004    0.000 colorful-tcpdump.py:335(crc_colorize)                                                
+      576    0.002    0.000    0.167    0.000 colorful-tcpdump.py:679(get_ip_info)                                                 
+     3177    0.001    0.000    0.002    0.000 decoder.py:116(_decode_uint)                                                         
+    50195    0.015    0.000    0.020    0.000 decoder.py:121(_decode_utf8_string)                                                  
+83517/552    0.051    0.000    0.133    0.000 decoder.py:141(decode)                                                               
+      406    0.000    0.000    0.000    0.000 decoder.py:164(_read_extended)                                                       
+     1104    0.000    0.000    0.000    0.000 decoder.py:174(_verify_size)                                                         
+    83517    0.012    0.000    0.012    0.000 decoder.py:182(_size_from_ctrl_byte)                                                 
+      345    0.000    0.000    0.014    0.000 decoder.py:44(_decode_array)
+       61    0.000    0.000    0.000    0.000 decoder.py:51(_decode_boolean)
+     1104    0.001    0.000    0.001    0.000 decoder.py:60(_decode_double)
+ 6117/552    0.021    0.000    0.132    0.000 decoder.py:85(_decode_map)
+22518/9161    0.021    0.000    0.114    0.000 decoder.py:93(_decode_pointer)
+...
+
+      576    0.000    0.000    0.158    0.000 reader.py:113(get)
+      576    0.001    0.000    0.158    0.000 reader.py:123(get_with_prefix_len)
+      576    0.004    0.000    0.017    0.000 reader.py:154(_find_address_in_tree)
+      576    0.000    0.000    0.000    0.000 reader.py:173(_start_node)
+     8879    0.009    0.000    0.012    0.000 reader.py:190(_read_node)
+      552    0.001    0.000    0.134    0.000 reader.py:212(_resolve_data_pointer)
+     9431    0.001    0.000    0.001    0.000 reader.py:317(node_byte_size)
+      552    0.000    0.000    0.000    0.000 reader.py:325(search_tree_size)
+    30045    0.002    0.000    0.002    0.000 typing.py:2214(cast)
+
         """
         import cProfile
         with cProfile.Profile() as pr:

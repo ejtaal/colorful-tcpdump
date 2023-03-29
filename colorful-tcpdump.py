@@ -453,13 +453,15 @@ else:
 
 
 if debug:
-  print( 'Our network addresses (will be placed on the left):')
-  for a in all_adds:
-      print( crc_colorize( a))
+    print( 'Our network addresses (will be placed on the left):')
+    for a in all_adds:
+        print( crc_colorize( a) + ' ', end='')
+    print('')
 
-  print( 'Local broadcast addresses:')
-  for b in all_broadcasts:
-      print( crc_colorize( b))
+    print( 'Local broadcast addresses:')
+    for b in all_broadcasts:
+        print( crc_colorize( b) + ' ', end='')
+    print('')
 
 
 
@@ -1016,7 +1018,7 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
         if terminal_size.columns < linesize_without_ansi:
             # print('CUT')
             # Assume there's no ansi sequences in the latter part of the string
-            # yes this maybe a gamble but usually it should work
+            # yes this may be a gamble but usually it should work
             cut_line = line[:-(linesize_without_ansi - terminal_size.columns +1 )] + '>'
             print( cut_line)
 
@@ -1075,6 +1077,18 @@ if args.info:
     ip = args.info[0]
     if debug:
       print( f'Lookup info about {ip} ...' )
+      if ip == '0.0.0.0':
+        print("Benchmarking...")
+        """
+        Prior to py-radix use, with plain "if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):" lookups, 625 IP lookups took 
+        """
+        import cProfile
+        with cProfile.Profile() as pr:
+            for i in range( 1, 25):
+                for j in range( 1, 25):
+                    a = get_ip_info( f"{i}.{j}.45.67")
+        pr.print_stats()
+        exit(0)
     print( get_ip_info( ip).lstrip())
     exit(0)
 

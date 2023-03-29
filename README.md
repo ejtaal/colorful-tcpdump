@@ -2,6 +2,8 @@
 
 Welcome to Colorful tcpdump!
 
+![Colorful Tcpdump logo](ctd-logo-cropped.png)
+
 # What does it do?
 
 This script aims to make tcpdump output even more useful for debugging any and all network related issues, by adding colors and meta data for IPs and connections observed.
@@ -17,6 +19,27 @@ Please see the feature list below.
 - When a DNS query is performed the results are cached. If an IP is subsequently seen that matches some of the resolved IPs replace it with the name that was searched for. This is a bit more intelligent than doing dumb reverse IP lookups that would often yield unhelpful results. Note this doesn't work with `tcpdump -q ...` as this doesn't print the full DNS query and results.
 - cuts off long lines when they don't fit in the terminal by default (and supports terminal resizing), but has an option to wrap them instead also.
 - time stamps colorized in a rolling rainbow just because we can :)
+
+# Screenshots
+
+Since a word only conveys a milli-picture, here are some screenshots:
+
+ctd-dns-c.cc-cropped.png    ctd-rainbow-timestamps-cropped.png  
+
+An example session showing some connections related to a Tor server in India, connections being made by a Firefox browser that is starting up and performing checks and logins, and some other connections. Note [GOOG] and [CF] denoting published IP ranges by Google and Cloudflare respectively.
+
+![Example session 1](example-firefox-session-starting-cropped.png)
+
+
+Note that when the IP is first pinged, there is no info on its DNS name. Once the DNS lookup is performed by ping, CTD tracks and displays it with the IP.
+
+![DNS resolution tracking](ctd-dns-c.cc-cropped.png)
+
+Colorful rainbow rotating timestamps may help in visual identification of time passed between packets.
+
+![Colorful timestamps](ctd-rainbow-timestamps-cropped.png)
+
+
 
 # Why?
 

@@ -1081,6 +1081,33 @@ if args.info:
         print("Benchmarking...")
         """
         Prior to py-radix use, with plain "if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):" lookups, 625 IP lookups took 
+
+
+4179521270 function calls (4179419383 primitive calls) in 1165.928 seconds
+   Ordered by: standard name                                                                                 ncalls  tottime  percall  cumtime  percall filename:lineno(function)            
+        1    0.000    0.000    0.000    0.000 cProfile.py:117(__exit__)     
+     1171    0.003    0.000    0.005    0.000 colorful-tcpdump.py:258(rgb_ansi)
+     1171    0.005    0.000    0.012    0.000 colorful-tcpdump.py:335(crc_colorize)
+      576   84.065    0.146 1165.928    2.024 colorful-tcpdump.py:638(get_ip_info)
+...
+ 70831872   16.640    0.000   16.640    0.000 ipaddress.py:1157(_make_netmask)                                                     
+141664320   97.454    0.000  662.946    0.000 ipaddress.py:1183(_ip_int_from_string)                                               
+      576    0.000    0.000    0.001    0.000 ipaddress.py:120(v4_int_to_packed)
+566657280  347.067    0.000  437.131    0.000 ipaddress.py:1209(_parse_octet)
+      576    0.000    0.000    0.000    0.000 ipaddress.py:1271(version)
+141664336  102.908    0.000  785.296    0.000 ipaddress.py:1282(__init__)
+      576    0.000    0.000    0.001    0.000 ipaddress.py:1317(packed)
+ 70831872  120.406    0.000  653.229    0.000 ipaddress.py:1475(__init__)
+ 70831872   29.728    0.000   42.779    0.000 ipaddress.py:156(_split_optional_netmask)
+      576    0.001    0.000    0.006    0.000 ipaddress.py:28(ip_address)
+       16    0.000    0.000    0.000    0.000 ipaddress.py:415(_check_int_address)
+       16    0.000    0.000    0.000    0.000 ipaddress.py:431(_ip_int_from_prefix)
+       15    0.000    0.000    0.000    0.000 ipaddress.py:474(_prefix_from_prefix_string)
+ 70831872   51.545    0.000  111.549    0.000 ipaddress.py:533(_split_addr_prefix)
+141663744   12.003    0.000   12.003    0.000 ipaddress.py:574(__int__)
+ 70831872   28.836    0.000   35.714    0.000 ipaddress.py:739(__contains__)
+ ...
+ etc
         """
         import cProfile
         with cProfile.Profile() as pr:

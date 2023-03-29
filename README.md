@@ -51,24 +51,32 @@ pip3 install colorama netifaces maxminddb_geolite2
 Make sure the python modules are installed, or you are in your nominated virtualenv python environment.
 
 ```
- ./ctd --help
-usage: colorful-tcpdump.py [-h] [--info IP] [-d] [-w] [--nocolor] [-nl] [--myip-override IP] [--debug] [TCPDUMP_LIKE_CMD]
+$ ./ctd --help
+usage: colorful-tcpdump.py [-h] [--info IP] [-d] [-w] [--nocolor] [-nl]
+                           [--myip-override IP] [--debug]
+                           [TCPDUMP_LIKE_CMD]
 
-A script to prettify tcpdump output with colours, add extra info regarding IPs seen, and add some other enhancements to the output.
+A script to prettify tcpdump output with colours, add extra info regarding IPs seen, and
+add some other enhancements to the output.
 
 positional arguments:
-  TCPDUMP_LIKE_CMD      The command to run, from which output is read and colorized. This is assumed to be tcpdump or similar (support for others is TODO)
+  TCPDUMP_LIKE_CMD      The command to run, from which output is read and colorized. This
+                        is assumed to be tcpdump or similar (support for others is TODO)
 
 options:
   -h, --help            show this help message and exit
   --info IP             Tell me what you know about this IP and then quit.
   -d, --detect-local-from-input
-                        Do not detect local interfaces in code, but detect them from running e.g. `ip addr` prior to the tcpdump command. This is useful for
-                        when output is read from a remote ssh tcpdump command instead of a locally running one, e.g. `./ctd -d ssh "ip addr; tcpdump -qlni
-                        eth0"`
-  -w, --wrap            Wrap long lines. Default is to cut lines that don't fit in the terminal
-  --nocolor             Do away with all the eye candy colors!. Use this in scripts when you just want to capture plain text info without all the ANSI color
-                        sequences.
+                        Do not detect local interfaces in code, but detect them from
+                        running e.g. `ip addr` prior to the tcpdump command. This is
+                        useful for when output is read from a remote ssh tcpdump command
+                        instead of a locally running one, e.g. `./ctd -d ssh
+						user@remotehost "ip addr; tcpdump -qlni eth0"`
+  -w, --wrap            Wrap long lines. Default is to cut lines that don't fit in the
+                        terminal
+  --nocolor             Do away with all the eye candy colors!. Use this in scripts when
+                        you just want to capture plain text info without all the ANSI
+                        color sequences.
   -nl, --nologo         Skip showing the super cool logo
   --myip-override IP    set a local IP manually
   --debug               Print way more debugging info.
@@ -77,11 +85,15 @@ options:
 
 At the moment it needs to be called from the cloned folder, like so:
 
+```
 ./ctd sudo tcpdump -lni eth0 icmp or port 53
+```
 
 Other examples of popular options include:
 
+```
 ./ctd --nocolor --info 1.1.1.1
+```
 
 
 

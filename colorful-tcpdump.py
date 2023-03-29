@@ -399,7 +399,7 @@ group.add_argument( '--info', metavar='IP', type=str, nargs=1, help='Tell me wha
 # group.add_argument( '-u', "--usage", help="usage", action="store_true")
 group.add_argument( 'read', metavar='TCPDUMP_LIKE_CMD',  type=str, nargs='?', help='The command to run, from which output is read and colorized. This is assumed to be tcpdump or similar (support for others is TODO)')
 
-parser.add_argument( '-d', '--detect-local-from-input', action='store_true', help='Do not detect local interfaces in code, but detect them from running e.g. `ip addr` prior to the tcpdump command. This is useful for when output is read from a remote ssh tcpdump command instead of a locally running one, e.g. `./ctd -d ssh "ip addr; tcpdump -qlni eth0"`')
+parser.add_argument( '-d', '--detect-local-from-input', action='store_true', help='Do not detect local interfaces in code, but detect them from running e.g. `ip addr` prior to the tcpdump command. This is useful for when output is read from a remote ssh tcpdump command instead of a locally running one, e.g. `./ctd -d ssh user@remotehost "ip addr; tcpdump -qlni eth0"`')
 # parser.add_argument( '--help', action='store_true')
 #parser.add_argument(  action='store_true')
 parser.add_argument( '-w', "--wrap", help="Wrap long lines. Default is to cut lines that don't fit in the terminal", action="store_true")
@@ -1071,9 +1071,11 @@ def write_output(get):
 
 
 if args.info:
+    # nargs=1 changes args.info into a list for some reason...?
+    ip = args.info[0]
     if debug:
-      print( f'Lookup info about {args.info} ...' )
-    print( get_ip_info( args.info).lstrip())
+      print( f'Lookup info about {ip} ...' )
+    print( get_ip_info( ip).lstrip())
     exit(0)
 
 if debug:

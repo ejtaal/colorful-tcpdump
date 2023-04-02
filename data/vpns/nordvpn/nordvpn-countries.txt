@@ -1,0 +1,118 @@
+US  (15 cities)    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✔    
+Canada  (3 cities)    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✔    
+Brazil    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Argentina    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Mexico    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Costa Rica    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Chile    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘               Europe            
+United Kingdom    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✔    
+Germany  (2 cities)    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✘     Dedicated IP   ✔    
+Netherlands    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✔    
+France  (2 cities)    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✔    
+Sweden    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✔    
+Switzerland    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✘    
+Belgium    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Denmark    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Norway    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Poland    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Ireland    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Czech Republic    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Italy    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✘     Dedicated IP   ✔    
+Spain    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Finland    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Serbia    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Austria    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Slovakia    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Slovenia    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Bulgaria    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Hungary    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Latvia    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Romania    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Portugal    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Luxembourg    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Ukraine    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Greece    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Estonia    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Iceland    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Albania    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Cyprus    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Croatia    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Moldova    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Bosnia and Herzegovina    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Georgia    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+North Macedonia    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Lithuania    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘               Asia Pacific            
+Australia  (5 cities)    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✔    
+Singapore    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✘     Dedicated IP   ✘    
+Japan    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✘     Dedicated IP   ✔    
+Hong Kong    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✔     Dedicated IP   ✘    
+New Zealand    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Taiwan    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✔     Dedicated IP   ✘    
+Vietnam    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Indonesia    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Malaysia    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+South Korea    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Thailand    Regular   ✔     P2P   ✘     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘               Africa and Middle East            
+South Africa    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+United Arab Emirates    Regular   ✘     P2P   ✘     Obfuscated   ✔     Double VPN   ✘     Dedicated IP   ✘    
+Israel    Regular   ✔     P2P   ✔     Obfuscated   ✘     Double VPN   ✘     Dedicated IP   ✘    
+Türkiye    Regular   ✔     P2P   ✔     Obfuscated   ✔     Double VPN   ✘     Dedicated IP   ✘                        What protocols are used by NordVPN?        NordLynx           IKEv2/IPSec           OpenVPN UDP/TCP                Americas            
+US  (15 cities)    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Canada  (3 cities)    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Brazil    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Argentina    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Mexico    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Costa Rica    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Chile    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔               Europe            
+United Kingdom    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Germany  (2 cities)    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Netherlands    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+France  (2 cities)    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Sweden    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Switzerland    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Belgium    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Denmark    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Norway    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Poland    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Ireland    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Czech Republic    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Italy    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Spain    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Finland    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Serbia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Austria    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Slovakia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Slovenia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Bulgaria    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Hungary    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Latvia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Romania    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Portugal    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Luxembourg    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Ukraine    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Greece    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Estonia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Iceland    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Albania    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Cyprus    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Croatia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Moldova    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Bosnia and Herzegovina    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Georgia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+North Macedonia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Lithuania    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔               Asia Pacific            
+Australia  (5 cities)    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Singapore    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Japan    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Hong Kong    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+New Zealand    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Taiwan    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Vietnam    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Indonesia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Malaysia    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+South Korea    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Thailand    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔               Africa and Middle East            
+South Africa    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+United Arab Emirates    NordLynx   ✘     IKEv2/IPSec   ✘     OpenVPN UDP/TCP   ✔    
+Israel    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔    
+Türkiye    NordLynx   ✔     IKEv2/IPSec   ✔     OpenVPN UDP/TCP   ✔                      Choose NordVPN servers’ address by city                 United States                Australia                Canada                UK                Germany                France                                      NordVPN servers in the United States                Atlanta               Buffalo               Charlotte               Chicago               Dallas               Denver               Los Angeles               Manassas                   Miami               New York               Phoenix               Saint Louis               Salt Lake City               San Francisco               Seattle                              NordVPN servers in Australia                Adelaide               Brisbane               Melbourne                   Perth               Sydney                              NordVPN servers in Canada                Montreal               Toronto                   Vancouver                              NordVPN servers in the UK                Edinburgh               Glasgow                   London               Manchester                              NordVPN servers in Germany                Berlin                   Frankfurt                              NordVPN servers in France                Paris                   Marseille                                  What is a VPN server?    A VPN server is a secure remote server that relays your data safely through the internet. It is a unique combination of hardware and proprietary software, making it much more advanced than simple remote servers. VPN servers may be further customized for specific tasks, such as P2P traffic or Tor access.  VPN server infrastructure is essential to your online security, privacy, and comfort. For example, servers close to your actual location often guarantee the best connection speed and streaming quality. This is why it’s important to have a wide variety of up-to-date VPN servers spread across the globe.                                             Connect to NordVPN servers with ease      Connect to any server    It takes only a single click or tap to be more private online. Just hit the Quick Connect button, and the app will connect you to the best VPN server for you at the moment.        Connect to any country    The U.S., France, Canada, or the United Kingdom? Changing your IP address to another country couldn’t be easier: just tap on a country pin on the map or scroll down the NordVPN server list to choose your encrypted destination.        Connect to specialty servers    Double VPN, Onion Over VPN, Obfuscated, P2P servers — you can find them all under the Specialty Servers section. Simply pick a category and get connected to the best server for your needs. Easy!                        Connect to any server   It takes only a single click or tap to be more private online. Just hit the Quick Connect button, and the app will connect you to the best VPN server for you at the moment.                Connect to any country   The U.S., France, Canada, or the United Kingdom? Changing your IP address to another country couldn’t be easier: just tap on a country pin on the map or scroll down the NordVPN server list to choose your encrypted destination.                Connect to specialty servers   Double VPN, Onion Over VPN, Obfuscated, P2P servers — you can find them all under the Specialty Servers section. Simply pick a category and get connected to the best server for your needs. Easy!                           See Pricing                       Get the security you need and so much more      5582  ultra-fast servers    Verified no-logs policy    Unlimited speed and bandwidth    Secure six devices at once    Live chat support 24/7     See All Features               Which NordVPN server should you choose?              Regular servers  Connect to over  5500  NordVPN servers in  60  countries to secure your connection, hide your IP address, and encrypt your internet traffic. Ideal for everyday digital protection.               Double VPN  Double VPN makes it twice as hard for hackers to decipher your internet traffic. It changes your IP address two times, protecting your connection with double encryption.               Onion Over VPN  Combine the strengths of a VPN and the Tor browser for extra privacy. One click, and your traffic is routed through The Onion Network, shielding your online activity.               Obfuscated servers  Bypass internet censorship when you’re in a country with restricted internet access. Connect to obfuscated servers to get around network firewalls and stay private online.               Dedicated IP  Get a static IP address to bypass CAPTCHAs and easily access IP-restricted networks. Choose a virtual location in France, the Netherlands, the U.S., the UK, or Germany.               P2P servers  Speed is essential for P2P sharing. Download files securely and at the best speed with hundreds of NordVPN P2P servers, or establish a direct secure link to your files with our  Meshnet feature .                     Be safer for longer.        Get 64% off NordVPN + 3 extra months        Get the Deal         30-day money-back guarantee            Be safer for longer.        Get 64% off NordVPN + 3 extra months        Get the Deal         30-day money-back guarantee            Be safer for longer.        Get 64% off NordVPN + 3 extra months        Get the Deal         30-day money-back guarantee            Be safer for longer.        Get 64% off NordVPN + 3 extra months        Get the Deal         30-day money-back guarantee                     Frequently asked questions         How do I change a VPN server?          You can easily change VPN servers within the NordVPN app. On Windows and macOS, you will see the server list to the left of the map screen. On Android, iPhone, and iPad, you can bring up the server list by swiping up on the map. If you need more help changing servers or even setting up NordVPN on any platform, visit our  tutorial section .           What does a VPN server do?          VPN servers act as a secure relay between your device and the internet. They are integral to your security and privacy online. First, online traffic between you and our VPN servers is encrypted, shielding your online activities from prying eyes. Second, websites and services only see the VPN server’s IP address, hiding your virtual location. To learn more about what NordVPN can do, read our handy  What is a VPN  primer.           Can I run my own VPN server?           You can, but it’s not that simple. Even with a host of online tutorials, setting up a secure VPN server requires a lot of IT knowledge and patience. Mistakes in the process can easily lead to data and location leaks, defeating the purpose of using a VPN. You also need to think about additional challenges, such as hosting and maintenance.   NordVPN  already offers the best VPN infrastructure on the market, with  5582  ultra-fast servers in  60  countries. We also operate under a strict no-logs policy, which was audited and approved twice by trusted experts for our customers’ peace of mind.            What are the best countries to connect to using a VPN?          The best VPN server at any given moment depends on your needs — for example, if you want to share files,  NordVPN  offers servers optimized for P2P traffic. In general, we advise you to choose countries that are close to your actual location, as your  VPN connection  speed depends on your distance to our server.           How do I find my VPN server address?          Simply connect to your chosen VPN server and visit our  What is my IP address  page. It will show you the server’s IP address and location. You can also find your IP address on the NordVPN app by clicking the server you’re connected to at the top of the NordVPN app screen or by clicking “Settings” and then “Statistics.”           What should I do when I can’t connect to a VPN server?          Check your internet connection – then try a different server. If the issue persists, log out and log back in or restart your NordVPN app. If you’re using antivirus software, disable it and try again. Find more information  here if you’re still unable to connect .                  

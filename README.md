@@ -45,7 +45,7 @@ One of my favorite tools of all time, tcpdump, has been long overdue to receivin
 
 (recommended: set up a virtualenv 'ctd' for the following)
 
-pip3 install colorama netifaces maxminddb_geolite2
+pip3 install colorama netifaces maxminddb_geolite2 py-radix
 
 # USAGE
 
@@ -106,6 +106,7 @@ Features
 	- Tag everything based on ASN?
 	- Use a more optimized IP lookup module, namely ___
 	- clean up the code which is currently a bit of a patchwork of stackoverflow solutions (🙈)
+	- Allow filtering on meta data? (e.g. to see all Google traffic: `--filter GOOG`)
 
 Data
 	- More cloud providers (could be got from ASN?)

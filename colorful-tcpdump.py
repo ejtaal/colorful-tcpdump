@@ -1121,6 +1121,8 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
             # yes this may be a gamble but usually it should work
             cut_line = line[:-(linesize_without_ansi - terminal_size.columns +1 )] + '>'
             print( cut_line)
+        else:
+            print( line)
 
     # continue
     # # print( f"{size} - {linesize_without_ansi}")
@@ -1258,7 +1260,8 @@ if debug:
   print( 'read = ', args.read)
 
 if args.read == '-':
-    #print( 'CTD: Reading from stdin ...' )
+    if debug:
+      print( 'CTD: Reading from stdin ...' )
     for line in sys.stdin:
         #print( f'line: {line.rstrip()}')
         prettify_tcpdump_line_so_it_looks_nice( line.rstrip())

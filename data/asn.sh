@@ -7,9 +7,13 @@
 # the queue for lookups
 OUTPUT=91-asn-ctd-data.json
 FREQ_REPORT=asn-most-common.txt
-SOURCE=ip2asn-combined.tsv
+#SOURCE=ip2asn-combined.tsv
+# cat straight from .gz file instead:
 SOURCE=ip2asn-combined.tsv.gz
 URL="https://iptoasn.com/data/ip2asn-combined.tsv.gz"
+
+# Save size/date of source file
+ls -l "$SOURCE" > "${SOURCE}.txt"
 
 # wget -O "$SOURCE" "$URL"
 MAX_CACHE_AGE=$((7*24*60))
@@ -28,7 +32,7 @@ extract_asn() {
 #		| grep "$grep_command"
 #	exit 1
 	zcat "$SOURCE" \
-		| grep "$grep_command" \
+		| egrep "$grep_command" \
 		| while read first last stop something country owner; do
 			#echo "$first $last $something $country $owner"
 			#echo "first = $first, last = $last"
@@ -72,6 +76,11 @@ extract_asn OVH 'OVH$'
 extract_asn ONEWEB "ONEWEB"
 extract_asn SPACEX "SPACEX-STARLINK"
 extract_asn MOZILLA "MOZILLA"
+extract_asn CENSYS "CENSYS"
+extract_asn COMCAST "COMCAST"
+extract_asn UUNET "UUNET"
+extract_asn CERNET "CERNET"
+extract_asn ALIBABA "(ALIBABA|Alibaba.com)"
 extract_asn AKAMAI "AKAMAI"
 
 ls -l "$OUTPUT"

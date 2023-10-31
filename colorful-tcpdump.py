@@ -988,9 +988,15 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 
     # See if local addresses / broadcasters can be placed on the left
     for add in all_adds:
-        if re.search( ' > ' + add + f'(:|\.{port})', line):
+        if re.search( f' > {add}(:|\.{port})', line):
             #print( "LOCAL on the right found")
-            line = re.sub( '\s('+proto+')\s(.*) > (.*?):\s', ' \g<1> \g<3> < \g<2>: ', line)
+            line = re.sub( f'\s({proto})\s(.*) > (.*?):\s', 
+                f' \g<1> {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}>>{Style.RESET_ALL}\g<3> < \g<2>: ', line)
+        else:
+            # Any local ones are now all on the left already
+            line = re.sub( 
+                f'\s({add})(:|\.{port}) > ', 
+                f' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}>>{Style.RESET_ALL}\g<1>\g<2> > ', line)
 
     for add in all_broadcasts:
         if re.search( ' > ' + add + f'(:|\.{port})', line):

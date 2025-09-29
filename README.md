@@ -45,8 +45,16 @@ One of my favorite tools of all time, tcpdump, has been long overdue to receivin
 
 (recommended: set up a virtualenv 'ctd' for the following)
 
+```
 pip3 install colorama netifaces maxminddb_geolite2 py-radix
+```
 
+If you get an error installing py-radix (Debian 13 and other new and bleeding edge distros) try this:
+
+```
+pip3 install git+https://github.com/mjschultz/py-radix.git@v1.0.0 
+pip3 install colorama netifaces maxminddb_geolite2
+```
 # USAGE
 
 Make sure the python modules are installed, or you are in your nominated virtualenv python environment.

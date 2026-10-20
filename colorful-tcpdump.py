@@ -626,11 +626,16 @@ if debug:
   print("Loading range data...")
 with open('data/ctd-data.json') as json_file:
     data = json.load(json_file)
-    for key,value in data.items():
+    # Merge JSON entries into ranges_info so the radix tree picks up BOTH
+    # the hardcoded ranges (RFC1918, MCAST defined above) and the JSON-defined
+    # ones. Previously only data.items() was iterated, so RFC1918 and MCAST
+    # were never inserted into the radix tree and lookups silently missed
+    # them at runtime (e.g. 192.168.x.x IPs got no [RFC1918/C] tag).
+    ranges_info.update(data)
+    for key,value in ranges_info.items():
         if debug:
           print( key + ' ', end='')
-        ranges_info[ key] = data[ key]
-        for subnet,info in data[ key]:
+        for subnet,info in ranges_info[ key]:
             # if debug:
             #     print( f"{key}: {subnet}/{info}")
             # # Adding a node returns a RadixNode object. You can create

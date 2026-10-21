@@ -97,68 +97,46 @@ ctd_logo = """
 ####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ###### ##### #### ### ## # ####### ######
 """
 
-### Set up everything to do with colours. Some of the basic color stuff is no longer used, TODO: remove that
-from typing import Iterable, Tuple
+### Set up everything to do with colours
 import colorsys
 import itertools
-from fractions import Fraction
-from pprint import pprint
 import re
 
-def zenos_dichotomy() -> Iterable[Fraction]:
-    """
-    http://en.wikipedia.org/wiki/1/2_%2B_1/4_%2B_1/8_%2B_1/16_%2B_%C2%B7_%C2%B7_%C2%B7
-    """
+def zenos_dichotomy():
     for k in itertools.count():
-        yield Fraction(1,2**k)
+        yield 1/2**k
 
-def fracs() -> Iterable[Fraction]:
-    """
-    [Fraction(0, 1), Fraction(1, 2), Fraction(1, 4), Fraction(3, 4), Fraction(1, 8), Fraction(3, 8), Fraction(5, 8), Fraction(7, 8), Fraction(1, 16), Fraction(3, 16), ...]
-    [0.0, 0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875, 0.0625, 0.1875, ...]
-    """
-    yield Fraction(0)
+def fracs():
+    yield 0
     for k in zenos_dichotomy():
-        i = k.denominator # [1,2,4,8,16,...]
+        i = k # [1,2,4,8,16,...]
         for j in range(1,i,2):
-            yield Fraction(j,i)
+            yield j/i
 
-# can be used for the v in hsv to map linear values 0..1 to something that looks equidistant
-# bias = lambda x: (math.sqrt(x/3)/Fraction(2,3)+Fraction(1,3))/Fraction(6,5)
+def hue_to_tones(h):
+    for s in [0.6]:
+        for v in [0.8, 0.7]:
+            yield (h, s, v)
 
-HSVTuple = Tuple[Fraction, Fraction, Fraction]
-RGBTuple = Tuple[float, float, float]
-
-def hue_to_tones(h: Fraction) -> Iterable[HSVTuple]:
-    for s in [Fraction(6,10)]: # optionally use range
-        #for v in [Fraction(8,10),Fraction(5,10)]: # could use range too
-        for v in [Fraction(8,10),Fraction(7,10)]: # could use range too
-            yield (h, s, v) # use bias for v here if you use range
-
-def hsv_to_rgb(x: HSVTuple) -> RGBTuple:
-    return colorsys.hsv_to_rgb(*map(float, x))
+def hsv_to_rgb(x):
+    return colorsys.hsv_to_rgb(*x)
 
 flatten = itertools.chain.from_iterable
 
-def hsvs() -> Iterable[HSVTuple]:
+def hsvs():
     return flatten(map(hue_to_tones, fracs()))
 
-def rgbs() -> Iterable[RGBTuple]:
+def rgbs():
     return map(hsv_to_rgb, hsvs())
 
-def rgb_to_css(x: RGBTuple) -> str:
-    #uint8tuple = map(lambda y: int(y*255), x)
+def rgb_to_css(x):
     t = tuple(map(lambda y: int(y*255), x))
     tup = list(t) + [0]
-    #:w
-    # tup[3] = 0
     if (0.299 * tup[0] + 0.587 * tup[1] + 0.114 * tup[2])/255 > 0.5:
         tup[3] = 1
-    
     return tup
-    #return "rgb({},{},{})".format(*uint8tuple)
 
-def css_colors() -> Iterable[str]:
+def css_colors():
     return map(rgb_to_css, rgbs())
 
 def rainbowColor( percent_x2):
@@ -169,15 +147,15 @@ def rainbowColor( percent_x2):
     q = 255 - t
     if h == 0:
         rgb = ( 255, t, 0)
-    if h == 1:
+    elif h == 1:
         rgb = ( q, 255, 0)
-    if h == 2:
+    elif h == 2:
         rgb = ( 0, 255, t)
-    if h == 3:
+    elif h == 3:
         rgb = ( 0, q, 255)
-    if h == 4:
+    elif h == 4:
         rgb = ( t, 0, 255)
-    if h == 5:
+    elif h == 5:
         rgb = ( 255, 0, q)
     
     tup = list(rgb) + [0]
@@ -197,61 +175,6 @@ Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 Style: DIM, NORMAL, BRIGHT, RESET_ALL
 """
-nice_colors = [
-#Back.BLUE + Fore.GREEN,
-Back.BLUE + Fore.YELLOW,
-#Back.BLUE + Fore.MAGENTA,
-Back.BLUE + Fore.CYAN,
-Back.BLUE + Fore.WHITE,
-Back.BLUE + Style.BRIGHT + Fore.RED,
-Back.BLUE + Style.BRIGHT + Fore.GREEN,
-Back.BLUE + Style.BRIGHT + Fore.YELLOW,
-Back.BLUE + Style.BRIGHT + Fore.BLUE,
-#Back.BLUE + Style.BRIGHT + Fore.MAGENTA,
-Back.BLUE + Style.BRIGHT + Fore.CYAN,
-Back.BLUE + Style.BRIGHT + Fore.WHITE,
-
-Back.WHITE + Fore.RED,
-#Back.WHITE + Fore.YELLOW,
-Back.WHITE + Fore.MAGENTA,
-#Back.WHITE + Style.BRIGHT + Fore.RED,
-#Back.WHITE + Style.BRIGHT + Fore.YELLOW,
-#Back.WHITE + Style.BRIGHT + Fore.BLUE,
-
-Back.YELLOW + Fore.RED,
-Back.YELLOW + Fore.BLUE,
-#Back.YELLOW + Fore.MAGENTA,
-#Back.YELLOW + Fore.CYAN,
-Back.YELLOW + Fore.WHITE,
-Back.YELLOW + Style.BRIGHT + Fore.WHITE,
-
-#Back.RED + Fore.GREEN,
-Back.RED + Fore.CYAN,
-Back.RED + Fore.WHITE,
-Back.RED + Style.BRIGHT + Fore.GREEN,
-Back.RED + Style.BRIGHT + Fore.YELLOW,
-Back.RED + Style.BRIGHT + Fore.BLUE,
-Back.RED + Style.BRIGHT + Fore.MAGENTA,
-Back.RED + Style.BRIGHT + Fore.CYAN,
-Back.RED + Style.BRIGHT + Fore.WHITE,
-
-Back.BLACK + Fore.RED,
-Back.BLACK + Fore.GREEN,
-Back.BLACK + Fore.YELLOW,
-Back.BLACK + Fore.BLUE,
-Back.BLACK + Fore.MAGENTA,
-Back.BLACK + Fore.CYAN,
-Back.BLACK + Fore.WHITE,
-Back.BLACK + Style.BRIGHT + Fore.RED,
-Back.BLACK + Style.BRIGHT + Fore.GREEN,
-Back.BLACK + Style.BRIGHT + Fore.YELLOW,
-Back.BLACK + Style.BRIGHT + Fore.BLUE,
-Back.BLACK + Style.BRIGHT + Fore.MAGENTA,
-Back.BLACK + Style.BRIGHT + Fore.CYAN,
-#Back.BLACK + Style.BRIGHT + Fore.WHITE,
-]
-nice_colors_num = len( nice_colors)
-
 Z_FORE = 38
 Z_BACK = 48
 
@@ -288,39 +211,6 @@ def rgb_ansi( color_tuple, z_level=Z_FORE):
 
 import binascii
 
-# RGB values of:
-#  1 00X
-#  2 0X0
-#  3 0XX
-#  4 X00
-#  5 X0X
-#  6 XX0
-#  7 XXX
-#s of 95, 0, 0
-
-nice_colors = []
-color24b_step = 20
-color24b_min_intensity = 150
-color24b_gradients = int( 1 + (255 - color24b_min_intensity) / color24b_step)
-color24b_total = \
-    3 * color24b_gradients + \
-    3 * color24b_gradients ** 2 + \
-        color24b_gradients ** 3
-
-color24b_rgb_steps = [0]
-color24b_rgb_steps += list( range( 255, 255 - color24b_step * color24b_gradients - 1, -color24b_step))
-#print( *range( 255, 255 - color24b_step * #color24b_gradients, color24b_step))
-for r in color24b_rgb_steps:
-    for g in color24b_rgb_steps:
-        for b in color24b_rgb_steps:
-            if not (r == 0 and r == g and g == b):
-                # If these are taken as background, then calc a suitable foreground:
-                f=1
-                nice_colors += [( r, g, b, f)]
-                nice_colors += [( r, g, b, 2)]
-                #print( f'rgb: {r},{g},{b}')
-
-
 nice_colors = sample_colors
 for col in list(sample_colors):
   c = list(col)
@@ -343,14 +233,6 @@ def crc_colorize( s):
 
 def colorize_match( matchobj):
     return crc_colorize( matchobj.group(1))
-
-#for i in nice_colors:
-#    print( i + "Some text that is supposed to be readable" + Style.RESET_ALL)
-#print(Style.RESET_ALL)
-#print('back to normal now')
-
-#for c in sample_colors:
-#    print( rgb_ansi( c) + "Some text that is supposed to be readable")
 
 import random
 ### Replace different strings of length 1, 2 .., with the following words:
@@ -375,33 +257,17 @@ def show_logo():
     
     colored_logo = re.sub( r'([^\s]{1,6})', gen_random_logo_strings, colored_logo)
     colored_logo = re.sub( r'([^\s]{1,6})', colorize_match, colored_logo)
-    #colored_logo = re.sub( '(_+)', Fore.BLUE + '\g<1>' + Style.RESET_ALL, colored_logo)
-    #colored_logo = re.sub( '_/', f'_{Style.BRIGHT}{Fore.BLUE}/{Style.RESET_ALL}', colored_logo)
 
     print( colored_logo)
 
-    # global cmd
-    # print(cmd)
-    # print( cmd)
-    # if len( cmd) > 1 and cmd[1] == '--help':
-    #     print("MARK")
-    #     print( usage_text_full)
-    # else:
-    #     print( usage_text_short)
-    # exit(1)
-
 import argparse
-#parser = argparse.ArgumentParser( description='A script to prettify tcpdump output and increase information about IPs & networks', usage=usage())
 parser = argparse.ArgumentParser( description='A script to prettify tcpdump output with colours, add extra info regarding IPs seen, and add some other enhancements to the output.')
 
 group = parser.add_mutually_exclusive_group( required=True)
 group.add_argument( '--info', metavar='IP', type=str, nargs=1, help='Tell me what you know about this IP and then quit.')
-# group.add_argument( '-u', "--usage", help="usage", action="store_true")
 group.add_argument( 'read', metavar='TCPDUMP_LIKE_CMD',  type=str, nargs='?', help='The command to run, from which output is read and colorized. This is assumed to be tcpdump or similar (support for others is TODO)')
 
 parser.add_argument( '-d', '--detect-local-from-input', action='store_true', help='Do not detect local interfaces in code, but detect them from running e.g. `ip addr` prior to the tcpdump command. This is useful for when output is read from a remote ssh tcpdump command instead of a locally running one, e.g. `./ctd -d ssh user@remotehost "ip addr; tcpdump -qlni eth0"`')
-# parser.add_argument( '--help', action='store_true')
-#parser.add_argument(  action='store_true')
 parser.add_argument( '-w', "--wrap", help="Wrap long lines. Default is to cut lines that don't fit in the terminal", action="store_true")
 parser.add_argument( '--nocolor', action='store_false', help='Do away with all the eye candy colors!. Use this in scripts when you just want to capture plain text info without all the ANSI color sequences.')
 parser.add_argument( '-nl', "--nologo", help="Skip showing the super cool logo", action="store_true")
@@ -427,7 +293,6 @@ if args.detect_local_from_input:
 
 all_adds = []
 all_broadcasts = []
-all_ifs = []
 
 
 if debug:
@@ -441,7 +306,7 @@ else:
         #all_ifs.append( ifaddresses(ifaceName))
         for key, value in ifaddresses(ifaceName).items():
             #print(key, '->', value)
-            all_ifs.append( value)
+            pass  # all_ifs removed; no longer used
             if 'addr' in value[0]:
                 #print( 'addr', value[0]['addr'])
                 if value[0]['addr'] not in all_adds:
@@ -477,39 +342,10 @@ if debug:
   print("Argument List:", str(sys.argv))
 
 #cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
-#cmd = ['/sbin/tcpdump', '-lni', 'eth0']
-
-# TODO: add check for windows / windump / tshark?
-# TODO: Rather, detect it based on input
-# TODO: Parse those arguments so nicely described in the usage notes
-# cmd = ['/sbin/tcpdump']
-# cmd += sys.argv[1:]
 cmd = sys.argv
 
 
-
-"""
-hex = qr/[0-9a-f]/;
-fqdn = qr/(?:[A-Za-z\d\-\.]+\.[a-z]+)/;
-#my $ipv4_addr = qr/(?:(?:\d{1,3}\.){3}\d{1,3})/;
-ipv4_addr = qr/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
-ipv6_grp = qr/$hex{1,4}/;
-ipv6_addr = qr/(?:::)?(?:${ipv6_grp}::?)+${ipv6_grp}(?:::)?/;
-ipv6_rev = qr/(?:(?:$hex\.){31}$hex)/;
-ipv6_addr = qr/(?:$ipv6_addr|$ipv6_rev)/;
-port = qr/(?:\d{1,5}|[a-z\d\-\.]+)/;
-
->>> def dashrepl(matchobj):
-...     if matchobj.group(0) == '-': return ' '
-...     else: return '-'
->>> re.sub('-{1,2}', dashrepl, 'pro----gram-files')
-'pro--gram files'
->>> re.sub(r'\sAND\s', ' & ', 'Baked Beans And Spam', flags=re.IGNORECASE)
-'Baked Beans & Spam'
-"""
-
 fqdn = r'(?:[A-Za-z\d\-\.]+\.[a-z]+)';
-#my $ipv4_addr = qr/(?:(?:\d{1,3}\.){3}\d{1,3})/;
 ipv4_addr = r'(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
 # numeric or resolved port names:
 port = r'(?:\d{1,5}|[a-z\d\-\.]+)'
@@ -519,13 +355,8 @@ ipv6_addr = f'(?:::)?(?:{ipv6_grp}::?)+{ipv6_grp}(?:::)?'
 #ipv6_addr = '(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
 
 ipv6_addr = '(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
-#ipv6_addr = 
 
 proto = '[A-Z]{1,8}' # is 8 enough?
-#ipv6_rev = qr/(?:(?:$hex\.){31}$hex)/;
-#ipv6_addr = qr/(?:$ipv6_addr|$ipv6_rev)/;
-
-from pprint import pprint
 
 from geolite2 import geolite2
 reader = geolite2.reader()
@@ -766,57 +597,6 @@ def get_ip_info( ip):
     # Else nothing to report but DNS (if any found)
     return dnsinfo
 
-#     # The old barbaric way of looking up things:
-#     for descr in ranges_info.keys():
-#         moreinfo = []
-#         return_info = ""
-#         #print( 'descr: ', descr)
-#         for tup in ranges_info[ descr]:
-#             r = tup[0]
-#             rinfo = tup[1]
-#             #pprint( r)
-#             found=False
-#             if ':' not in ip and ':' not in r:
-#                 if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):
-#                     found=True
-#                     #print( 'Found ', ip, ' in range ', r, ' which is ', crc_colorize( rinfo))
-#             elif ':' in ip and ':' in r:
-#                 if ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
-#                     found=True
-# #            if ip.search('\.') and ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r)
-# #            or ipaddress.IPv6Address( ip) in ipaddress.IPv6Network(r):
-#                 #print( 'ip is in net', ip, r)
-#             if found:
-#                 moreinfo += [rinfo]
-
-#         #print( 'moreinfo: ', moreinfo)
-#         if len(moreinfo) > 0:
-#             addinfo = crc_colorize( descr)
-#             seen = []
-#             for i in moreinfo:
-#                 #print( 'i: ', i)
-#                 #print( 'seen: ', seen)
-#                 #if i in seen:
-#                 #    print('i in seen?')
-#                 #else:
-#                 #    print('i NOT in seen?')
-#                 if i not in seen and i != "":
-#                     addinfo += '/' + crc_colorize( i)
-#                     #print( 'addinfo: ', addinfo)
-#                 seen += [i]
-#             info += f'[{addinfo}]'
-
-
-
-#     # Don't look up this ip again
-#     info_cache[ip] = info
-
-#     if info != "":
-#         return dnsinfo + " " + info
-
-#     # Else nothing to report but DNS (if any found)
-#     return dnsinfo
-
 
 dns_cache= {}
 dns_cache['queries'] = {}
@@ -896,7 +676,6 @@ def rainbow_colorize_value( value, max_value, amplifier = 1):
       
 
 def colorize_timestamp( matchobj):
-    detectlocal = False
     # Rearrange like so: '\g<1>\g<2>\g<3>.\g<4> '
     #print( matchobj)
     color_tup1 = rainbow_colorize_value( matchobj.group(1), 23, 1)
@@ -1135,15 +914,6 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
         else:
             print( line)
 
-    # continue
-    # # print( f"{size} - {linesize_without_ansi}")
-    # print( "-" * linesize_without_ansi)
-    # print( line)
-    # print( '-')
-    # print( repr( ansi_escape.sub('', line)))
-    # print( '-')
-    # print( repr( line))
-
 # regex below adapted from incomplete answer that doesn't address 24bit colors here:
 # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
 # colored text: 155740.
@@ -1151,130 +921,15 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 # @-Z = @ plus capitals. 0-? is numbers plus :;<=>?. @-~ is cap and nocapletters plus {}|~
 ansi_escape = re.compile(r'(\x01)?\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])[\x01\x02]*')
 
-def read_stderr(pipe, funcs):
-    for line in iter(pipe.readline, ''):
-        for func in funcs:
-            func( (True, line))
-            # time.sleep(1)
-    pipe.close()
-
-def read_output(pipe, funcs):
-    for line in iter(pipe.readline, ''):
-        for func in funcs:
-            func( (False, line))
-            # time.sleep(1)
-    pipe.close()
-
-def write_output(get):
-    for isStderr, line in iter(get, None):
-        #sys.stdout.write(line.decode("utf-8"))
-        if isStderr:
-            print( 'stderr', line.rstrip().decode("utf-8"))
-        else:
-            prettify_tcpdump_line_so_it_looks_nice( line.rstrip().decode("utf-8"))
-
-"""
-#### main() ###
-"""
-
-
-
-
-
-##### Nice RGB color generation algos, taken from:
-### https://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors
-
-
 if args.info:
-    # nargs=1 changes args.info into a list for some reason...?
     ip = args.info[0]
-    if debug:
-      print( f'Lookup info about {ip} ...' )
-      if ip == '0.0.0.0':
-        print("Benchmarking...")
-        """
-        Prior to py-radix use, with plain "if ipaddress.IPv4Address( ip) in ipaddress.IPv4Network(r):" lookups, 576 IP lookups took 
-
-4179521270 function calls (4179419383 primitive calls) in 1165.928 seconds
-   Ordered by: standard name                                                                                 ncalls  tottime  percall  cumtime  percall filename:lineno(function)            
-        1    0.000    0.000    0.000    0.000 cProfile.py:117(__exit__)     
-     1171    0.003    0.000    0.005    0.000 colorful-tcpdump.py:258(rgb_ansi)
-     1171    0.005    0.000    0.012    0.000 colorful-tcpdump.py:335(crc_colorize)
-      576   84.065    0.146 1165.928    2.024 colorful-tcpdump.py:638(get_ip_info)
-...
- 70831872   16.640    0.000   16.640    0.000 ipaddress.py:1157(_make_netmask)                                                     
-141664320   97.454    0.000  662.946    0.000 ipaddress.py:1183(_ip_int_from_string)                                               
-      576    0.000    0.000    0.001    0.000 ipaddress.py:120(v4_int_to_packed)
-566657280  347.067    0.000  437.131    0.000 ipaddress.py:1209(_parse_octet)
-      576    0.000    0.000    0.000    0.000 ipaddress.py:1271(version)
-141664336  102.908    0.000  785.296    0.000 ipaddress.py:1282(__init__)
-      576    0.000    0.000    0.001    0.000 ipaddress.py:1317(packed)
- 70831872  120.406    0.000  653.229    0.000 ipaddress.py:1475(__init__)
- 70831872   29.728    0.000   42.779    0.000 ipaddress.py:156(_split_optional_netmask)
-      576    0.001    0.000    0.006    0.000 ipaddress.py:28(ip_address)
-       16    0.000    0.000    0.000    0.000 ipaddress.py:415(_check_int_address)
-       16    0.000    0.000    0.000    0.000 ipaddress.py:431(_ip_int_from_prefix)
-       15    0.000    0.000    0.000    0.000 ipaddress.py:474(_prefix_from_prefix_string)
- 70831872   51.545    0.000  111.549    0.000 ipaddress.py:533(_split_addr_prefix)
-141663744   12.003    0.000   12.003    0.000 ipaddress.py:574(__int__)
- 70831872   28.836    0.000   35.714    0.000 ipaddress.py:739(__contains__)
- ...
- etc
-
- Using py-radix:
-
-    return dnsinfo
-        429180 function calls (327293 primitive calls) in 0.167 seconds                                                           
-                                                                                                                                   
-   Ordered by: standard name                                                                                                       
-                                                                                                                                   
-   ncalls  tottime  percall  cumtime  percall filename:lineno(function)                                                            
-        1    0.000    0.000    0.000    0.000 cProfile.py:117(__exit__)                                                            
-     1123    0.001    0.000    0.002    0.000 colorful-tcpdump.py:258(rgb_ansi)                                                    
-     1123    0.001    0.000    0.004    0.000 colorful-tcpdump.py:335(crc_colorize)                                                
-      576    0.002    0.000    0.167    0.000 colorful-tcpdump.py:679(get_ip_info)                                                 
-     3177    0.001    0.000    0.002    0.000 decoder.py:116(_decode_uint)                                                         
-    50195    0.015    0.000    0.020    0.000 decoder.py:121(_decode_utf8_string)                                                  
-83517/552    0.051    0.000    0.133    0.000 decoder.py:141(decode)                                                               
-      406    0.000    0.000    0.000    0.000 decoder.py:164(_read_extended)                                                       
-     1104    0.000    0.000    0.000    0.000 decoder.py:174(_verify_size)                                                         
-    83517    0.012    0.000    0.012    0.000 decoder.py:182(_size_from_ctrl_byte)                                                 
-      345    0.000    0.000    0.014    0.000 decoder.py:44(_decode_array)
-       61    0.000    0.000    0.000    0.000 decoder.py:51(_decode_boolean)
-     1104    0.001    0.000    0.001    0.000 decoder.py:60(_decode_double)
- 6117/552    0.021    0.000    0.132    0.000 decoder.py:85(_decode_map)
-22518/9161    0.021    0.000    0.114    0.000 decoder.py:93(_decode_pointer)
-...
-
-      576    0.000    0.000    0.158    0.000 reader.py:113(get)
-      576    0.001    0.000    0.158    0.000 reader.py:123(get_with_prefix_len)
-      576    0.004    0.000    0.017    0.000 reader.py:154(_find_address_in_tree)
-      576    0.000    0.000    0.000    0.000 reader.py:173(_start_node)
-     8879    0.009    0.000    0.012    0.000 reader.py:190(_read_node)
-      552    0.001    0.000    0.134    0.000 reader.py:212(_resolve_data_pointer)
-     9431    0.001    0.000    0.001    0.000 reader.py:317(node_byte_size)
-      552    0.000    0.000    0.000    0.000 reader.py:325(search_tree_size)
-    30045    0.002    0.000    0.002    0.000 typing.py:2214(cast)
-
-        """
-        import cProfile
-        with cProfile.Profile() as pr:
-            for i in range( 1, 25):
-                for j in range( 1, 25):
-                    a = get_ip_info( f"{i}.{j}.45.67")
-        pr.print_stats()
-        exit(0)
     print( get_ip_info( ip).lstrip())
     exit(0)
-
-if debug:
-  print( 'read = ', args.read)
 
 if args.read == '-':
     if debug:
       print( 'CTD: Reading from stdin ...' )
     for line in sys.stdin:
-        #print( f'line: {line.rstrip()}')
         prettify_tcpdump_line_so_it_looks_nice( line.rstrip())
     exit(0)
 else:
@@ -1282,24 +937,3 @@ else:
   pass
 
 exit(1)
-
-
-#if len( cmd) == 2 and cmd[1] == '-':
-#    print( 'CTD: Reading from stdin ...' )
-#    for line in sys.stdin:
-#        #print( f'line: {line.rstrip()}')
-#        prettify_tcpdump_line_so_it_looks_nice( line.rstrip())
-#    exit(0)
-#
-#if len( cmd) > 1 and cmd[1] == '--info':
-#    print( f'Lookup info about {cmd[2]} ...' )
-#    print( get_ip_info( cmd[2]))
-#    exit(0)
-#
-#if len
-
-#if len( cmd) < 2 or cmd[1] == '-h' or cmd[1] == '--help':
-# Something didn't go quite right?
-usage()
-
-exit(0)

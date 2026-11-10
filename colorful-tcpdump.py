@@ -109,7 +109,7 @@ def zenos_dichotomy():
 def fracs():
     yield 0
     for k in zenos_dichotomy():
-        i = k # [1,2,4,8,16,...]
+        i = int(round(1/k)) # dyadic denominators: 1, 2, 4, 8, ... (was float, which range() rejects on Python 3)
         for j in range(1,i,2):
             yield j/i
 
@@ -234,6 +234,17 @@ def crc_colorize( s):
 def colorize_match( matchobj):
     return crc_colorize( matchobj.group(1))
 
+# IPv6 family colours: restrict the stable CRC palette to the cool
+# (blue-dominant) half so IPv6 addresses are recognisable by temperature.
+# Link-local fe80:: addresses get dimmed: ubiquitous and rarely interesting.
+cool_colors = [c for c in sample_colors if c[2] > c[0]]
+
+def crc_colorize_cool( s):
+    if nocolor:
+      return( s)
+    crc = binascii.crc_hqx( s.encode('ascii'), 0)
+    return rgb_ansi( cool_colors[ crc % len( cool_colors)]) + s + Style.RESET_ALL
+
 import random
 ### Replace different strings of length 1, 2 .., with the following words:
 tcpdump_logo_strings = [ [], ['>', '+', '.', ':', '<'],
@@ -344,11 +355,6 @@ import os
 
 if debug:
   print("Argument List:", str(sys.argv))
-
-if pids_enabled:
-  _process_thread = threading.Thread(target=_poll_process_map, daemon=True)
-  _process_thread.start()
-  print("[*] Process identification enabled (polling psutil every 1.5s)")
 
 #cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
 cmd = sys.argv
@@ -548,6 +554,11 @@ def _poll_process_map():
             pass
         _process_stop.wait(1.5)
 
+if pids_enabled:
+  _process_thread = threading.Thread(target=_poll_process_map, daemon=True)
+  _process_thread.start()
+  print("[*] Process identification enabled (polling psutil every 1.5s)")
+
 def _extract_source_addr(line):
     """Extract the source IP and port from the first packet on the line.
     Returns (ip, port_str) or (None, None).
@@ -741,8 +752,27 @@ FLAG_COLORS = {
 
 def colorize_flags( matchobj):
     # Deliberately do not re-emit 'Flags ' to keep the output terse
-    flags = matchobj.group(2)
-    return FLAG_COLORS.get( flags, '') + flags + Style.RESET_ALL
+    flags = matchobj.group(2).strip( '[]')
+    return FLAG_COLORS.get( flags, '') + '[' + flags + ']' + Style.RESET_ALL
+
+### IPv6 family colour + L2 control-plane protocol colours
+IP6_STYLE = f'{Back.BLACK}{Style.BRIGHT}{Fore.CYAN}'    # 'IP6' keyword: cyan = v6, vs warm green = v4
+L2_STYLE  = f'{Back.BLACK}{Style.BRIGHT}{Fore.MAGENTA}' # L2 control-plane keywords (STP, CDP, UDLD, ...)
+
+# L2/router control-plane traffic seen on the wire (all print their name in
+# plain text in tcpdump output, so keyword colouring is enough):
+L2_CONTROL_KEYWORDS = r'CDPv2|UDLDv1|RSTP|MSTP|STP|LLDP|VTP|DTP|PAgP|LACP|EAPOL|CDP|UDLD|PVST\+|MVRP|GVRP|Dot1x'
+
+def ip6_dim_prefix( ip):
+    return Style.DIM if ip.startswith( 'fe80') else ''
+
+def colorize_match_ip6_port( matchobj):
+    ip, port = matchobj.group(1), matchobj.group(2)
+    return ip6_dim_prefix( ip) + crc_colorize_cool( ip) + ':' + crc_colorize( port) + get_ip_info( ip)
+
+def colorize_match_ip6( matchobj):
+    ip = matchobj.group(1)
+    return ip6_dim_prefix( ip) + crc_colorize_cool( ip)
 
 def rainbow_colorize_value( value, max_value, amplifier = 1):
     tup = rainbowColor( int(value) * 200 / max_value)
@@ -924,9 +954,9 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
         printn('WiFiPkt?:')
         line = re.sub( rf'\s+BSSID:.*?, ethertype (IPv\d) .*?: (.*)$', r' \g<1> \g<2>', line)
         line = re.sub( ' (IPv4) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL} ', line)
-        line = re.sub( ' (IPv6) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}\g<1>{Style.RESET_ALL} ', line)
+        line = re.sub( ' (IPv6) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.CYAN}\g<1>{Style.RESET_ALL} ', line)
         line = re.sub( rf'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
-        line = re.sub( rf'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
+        line = re.sub( rf'({ipv6_addr})\.({port})', colorize_match_ip6_port, line)
         line = re.sub( rf'seq (\d+):(\d+),', colorize_matches_within, line)
         line = re.sub( rf'ack (\d+),', colorize_matches_within, line)
 
@@ -949,22 +979,26 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
         printn('TCP:')
         line = pktmon_tcp_pkt.group(1) + ' ' + pktmon_tcp_pkt.group(2) + pktmon_tcp_pkt.group(3)
         line = re.sub( ' (IPv4) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL} ', line)
-        line = re.sub( ' (IPv6) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}\g<1>{Style.RESET_ALL} ', line)
+        line = re.sub( ' (IPv6) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.CYAN}\g<1>{Style.RESET_ALL} ', line)
         line = re.sub( rf'seq (\d+):(\d+),', colorize_matches_within, line)
         line = re.sub( rf'ack (\d+),', colorize_matches_within, line)
         #line = re.sub('[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?: (.*: Flags .*  length \d+)$', '\g<1> \g<2>', line)
 
     if re.search( ' IP .*: (?:tcp |UDP,|Flags)', line):
         line = re.sub( rf'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
-    elif re.search( ' IP6 .*: (?:tcp |UDP,|0)', line):
-        line = re.sub( rf'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
+    elif re.search( ' IP6 .*: (?:tcp |UDP,|Flags|0)', line):
+        line = re.sub( rf'({ipv6_addr})\.({port})', colorize_match_ip6_port, line)
     elif re.search( ': ICMP ', line):
         line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
         line = re.sub( '(ICMP echo request)', rf'{Back.BLACK}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
         line = re.sub( '(ICMP echo reply)', rf'{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
 
-    elif re.search( ': ICMP6 ', line):
-        line = re.sub( f'({ipv6_addr})', colorize_match, line)
+    elif re.search( ': ICMP6', line):
+        # Bare IPv6 addresses: anchor to 'IP6 ' / '> ' so timestamps
+        # ('15:52:21' also looks like hex-colons!) don't get colorized.
+        # Greedy hex/colon run (must end on a hex digit) - the ipv6_addr
+        # regex alone stops at the shortest alternative ('fe80::').
+        line = re.sub( r'(?<=[6>] )([0-9a-fA-F:]+[0-9a-fA-F](?:%[0-9a-zA-Z]+)?)', colorize_match_ip6, line)
     elif re.search( ' ARP', line):
         # ARP, Request who-has 172.30.253.88 (00:15:5d:0f:f3:ba) tell 172.30.240.1, length 28
         line = re.sub( ', Request who-has (.*?) tell (.*?),', 
@@ -980,6 +1014,11 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 
     # Deal with all 'Flags [...]' in one place (also drops the word 'Flags' for terseness)
     line = re.sub( r'(Flags )(\[[SFPURWE.]+\])', colorize_flags, line)
+
+    # IPv6 family colour (cyan keyword, everywhere) + L2 control-plane
+    # protocols (STP, CDP, UDLD, LLDP, ...) in magenta
+    line = re.sub( r'\b(IP6)\b', IP6_STYLE + r'\g<1>' + Style.RESET_ALL, line)
+    line = re.sub( rf'\b({L2_CONTROL_KEYWORDS})\b', L2_STYLE + r'\g<1>' + Style.RESET_ALL, line)
 
     # TODO: Other things to learn and figure out:
     """

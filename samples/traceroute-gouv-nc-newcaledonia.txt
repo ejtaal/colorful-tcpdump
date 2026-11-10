@@ -1,0 +1,16 @@
+traceroute to www.gouv.nc (61.5.212.17), 40 hops max, 60 byte packets
+ 1  10.128.0.1 (10.128.0.1)  109.844 ms  109.807 ms
+ 2  irb-69.as01-10g.bcn1.es.m247.ro (146.70.22.129)  134.647 ms  134.620 ms
+ 3  irb-1901.agg1v.bcn1.es.m247.ro (185.206.226.76)  127.821 ms  127.879 ms
+ 4  vlan350.pni1.fra2.de.m247.ro (185.206.226.56)  109.705 ms  109.810 ms
+ 5  be9760.rcr21.bcn01.atlas.cogentco.com (149.6.130.80)  121.596 ms  121.614 ms
+ 6  be2867.ccr32.mrs02.atlas.cogentco.com (154.54.74.201)  127.816 ms  127.800 ms
+ 7  * *
+ 8  be9049.ccr71.syd01.atlas.cogentco.com (154.54.95.165)  357.199 ms  357.196 ms
+ 9  * *
+10  * *
+11  * *
+12  * *
+13  * *
+14  * *
+15  * 61.5.212.17 (61.5.212.17)  383.846 ms

@@ -1,0 +1,9 @@
+traceroute to www.auckland.ac.nz (199.232.35.10), 40 hops max, 60 byte packets
+ 1  10.128.0.1 (10.128.0.1)  94.614 ms
+ 2  irb-69.as01-10g.bcn1.es.m247.ro (146.70.22.129)  119.728 ms
+ 3  irb-1901.agg1v.bcn1.es.m247.ro (185.206.226.76)  193.743 ms
+ 4  vlan350.pni1.fra2.de.m247.ro (185.206.226.56)  110.368 ms
+ 5  *
+ 6  mad-b3-link.ip.twelve99.net (62.115.136.216)  115.790 ms
+ 7  fastly-ic-389817.ip.twelve99-cust.net (62.115.196.55)  115.788 ms
+ 8  199.232.35.10 (199.232.35.10)  115.786 ms

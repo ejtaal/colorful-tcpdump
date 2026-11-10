@@ -12,7 +12,7 @@ usage_text_short ="""
 
     --help  Display more help
 """
-usage_text_full = """
+usage_text_full = r"""
 
     Welcome to Colorful tcpdump!
 
@@ -275,6 +275,7 @@ parser.add_argument( '-nl', "--nologo", help="Skip showing the super cool logo",
 parser.add_argument( '--myip-override', metavar='IP', type=str, nargs=1, help='set a local IP manually')
 
 parser.add_argument( '--debug', action='store_true', help='Print way more debugging info.')
+parser.add_argument( '--no-pids', action='store_true', help='Disable process identification (the [proc:pid] tags on each line).')
 
 args = parser.parse_args()
 
@@ -289,6 +290,9 @@ if args.nocolor is False:
 
 if args.detect_local_from_input:
     detectlocal = True
+
+pids_enabled = not args.no_pids
+
 ### Get local interface addresses
 
 all_adds = []
@@ -341,6 +345,11 @@ import os
 if debug:
   print("Argument List:", str(sys.argv))
 
+if pids_enabled:
+  _process_thread = threading.Thread(target=_poll_process_map, daemon=True)
+  _process_thread.start()
+  print("[*] Process identification enabled (polling psutil every 1.5s)")
+
 #cmd = ['/sbin/tcpdump', '-qlni', 'eth0']
 cmd = sys.argv
 
@@ -354,7 +363,7 @@ ipv6_grp = f'{hexre}{1,4}';
 ipv6_addr = f'(?:::)?(?:{ipv6_grp}::?)+{ipv6_grp}(?:::)?'
 #ipv6_addr = '(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
 
-ipv6_addr = '(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
+ipv6_addr = r'(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
 
 proto = '[A-Z]{1,8}' # is 8 enough?
 
@@ -509,6 +518,57 @@ if debug:
 
 import ipaddress
 
+### Process identification (optional, requires psutil)
+process_map = {}  # (local_ip, local_port) -> (process_name, pid)
+_process_stop = threading.Event()
+
+def _poll_process_map():
+    """Background thread: periodically build a map of (local_ip, port) -> (process, pid)."""
+    try:
+        import psutil
+    except ImportError:
+        if debug:
+            print("psutil not installed — process identification disabled.")
+        return
+    while not _process_stop.is_set():
+        process_map.clear()
+        try:
+            for conn in psutil.net_connections(kind='inet'):
+                if conn.pid is None:
+                    continue
+                laddr = conn.laddr
+                if not laddr or not laddr.ip:
+                    continue
+                try:
+                    proc = psutil.Process(conn.pid)
+                    process_map[(laddr.ip, laddr.port)] = (proc.name(), conn.pid)
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+        except (psutil.AccessDenied, OSError):
+            pass
+        _process_stop.wait(1.5)
+
+def _extract_source_addr(line):
+    """Extract the source IP and port from the first packet on the line.
+    Returns (ip, port_str) or (None, None).
+    """
+    # IPv4: "IP 10.0.0.5.52341 >"
+    m = re.search(r'\bIP\s+(\d{1,3}(?:\.\d{1,3}){3})(\.\d+)\s*>', line)
+    if m:
+        return m.group(1), m.group(2)[1:]  # strip the leading '.'
+
+    # IPv6 with bracket notation: "IP6 [2001:db8::1].8080 >"
+    m = re.search(r'\bIP6\s+\[([^\]]+)\](\.\d+)\s*>', line)
+    if m:
+        return m.group(1), m.group(2)[1:]
+
+    # IPv6 bare: "IP6 fe80::1.8080 >" — last colon-group of digits is the port
+    m = re.search(r'\bIP6\s+([\da-fA-F:]+):(\d{1,5})\s*>', line)
+    if m:
+        return m.group(1), m.group(2)
+
+    return None, None
+
 # Ze great IP info cache
 info_cache={}
 
@@ -659,6 +719,31 @@ def colorize_matches_within( matchobj):
     
     return s
 
+### TCP flag colours, e.g. "Flags [P.]" -> "[P.]"
+# Key = what tcpdump shows between the brackets. Bare flag = normal tone,
+# flag + '.' (ACK) = bright, mirroring the existing [S] / [S.] convention.
+FLAG_COLORS = {
+    'S':    f'{Back.BLACK}{Fore.GREEN}',                    # SYN (open)
+    'S.':   f'{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}',      # SYN/ACK
+    '.':    f'{Back.GREEN}{Style.BRIGHT}{Fore.WHITE}',      # pure ACK
+    'P':    f'{Back.GREEN}{Fore.WHITE}',                    # PSH
+    'P.':   f'{Back.GREEN}{Fore.WHITE}',                    # PSH/ACK (data)
+    'R':    f'{Back.RED}{Fore.WHITE}',                      # RST (reset)
+    'R.':   f'{Back.RED}{Fore.WHITE}',                      # RST/ACK (closed port)
+    'F':    f'{Back.BLACK}{Fore.BLUE}',                     # FIN (close)
+    'F.':   f'{Back.BLACK}{Style.BRIGHT}{Fore.BLUE}',       # FIN/ACK
+    'FP':   f'{Back.BLACK}{Style.BRIGHT}{Fore.MAGENTA}',    # PSH+FIN (last data)
+    'FP.':  f'{Back.BLACK}{Style.BRIGHT}{Fore.MAGENTA}',
+    'U':    f'{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}',     # URG (urgent)
+    'E':    f'{Back.BLACK}{Fore.CYAN}',                     # ECN-Echo
+    'W':    f'{Back.BLACK}{Fore.CYAN}',                     # ECN CWR
+}
+
+def colorize_flags( matchobj):
+    # Deliberately do not re-emit 'Flags ' to keep the output terse
+    flags = matchobj.group(2)
+    return FLAG_COLORS.get( flags, '') + flags + Style.RESET_ALL
+
 def rainbow_colorize_value( value, max_value, amplifier = 1):
     tup = rainbowColor( int(value) * 200 / max_value)
     if amplifier < 1:
@@ -715,9 +800,9 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 3: sit0: <NOARP> mtu 1480 qdisc noop
     link/sit 0.0.0.0 brd 0.0.0.0
 """
-        ip_addr_link_local = re.search('\slink/\w+\s+([\d\.a-f:]+)\s', line)
-        ip_addr_ip_local = re.search('\sinet6?\s+([\d\.a-f:]+)\/(\d+)', line)
-        ip_addr_link_or_ip_brd = re.search('\sbrd\s+([\d\.a-f:]+)\s', line)
+        ip_addr_link_local = re.search(r'\slink/\w+\s+([\d\.a-f:]+)\s', line)
+        ip_addr_ip_local = re.search(r'\sinet6?\s+([\d\.a-f:]+)\/(\d+)', line)
+        ip_addr_link_or_ip_brd = re.search(r'\sbrd\s+([\d\.a-f:]+)\s', line)
         if ip_addr_link_local:
             # print('IP ADDR LINK:', ip_addr_link_local.group(1))
             all_adds.append( ip_addr_link_local.group(1))
@@ -736,11 +821,35 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
             all_broadcasts.append( ip_addr_link_or_ip_brd.group(1))
         # line = pktmon_udp_pkt.group(1) + pktmon_udp_pkt.group(2) + pktmon_udp_pkt.group(3)
 
+    # Process identification: extract source IP:port and look it up early,
+    # before any direction-reversing transformations.
+    # Insert [proc:pid] right after the source address (before " > ").
+    _src_ip, _src_port = None, None
+    if pids_enabled:
+        _src_ip, _src_port = _extract_source_addr(line)
+        if _src_ip and _src_port:
+            _proc = process_map.get((_src_ip, int(_src_port)))
+            if _proc:
+                _pname, _pid = _proc
+                _tag = '[' + crc_colorize(_pname) + crc_colorize(str(_pid)) + ']'
+                # IPv4: "IP 10.0.0.5.52341 > ..."
+                line = re.sub(
+                    '(' + ipv4_addr + r'(\.\d+))\s+>',
+                    r'\1' + _tag + r' >',
+                    line, count=1
+                )
+                # IPv6 bracket: "IP6 [2001:db8::1].8080 > ..."
+                line = re.sub(
+                    r'(\[' + ipv6_addr + r'\](\.\d+))\s+>',
+                    r'\1' + _tag + r' >',
+                    line, count=1
+                )
+
 
     """
     CF +QoS DA:E4-A4-71-B3-75-72 BSSID:80-26-89-AB-D9-84 SA:E4-A4-71-B3-75-72 Data IV:3aaaa Pad 0 KeyID 0
     """
-    if re.search('^\s+CF \+QoS DA', line):
+    if re.search(r'^\s+CF \+QoS DA', line):
         # Doesn't look too useful
         return
 
@@ -754,10 +863,10 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 02:28:21.105740 IP 172.30.253.88.53418 > 1.1.1.1.53: 18184+ A? blah.com. (26)
 02:28:21.177084 IP 172.30.253.88.40745 > 1.1.1.1.53: 25446+ AAAA? blah.com. (26)
         """
-    dns_query = re.search( '\.(\d+) > (.*?53: \d+).*?\? ([\w\.]+)\.', line)
+    dns_query = re.search(r'\.(\d+) > (.*?53: \d+).*?\? ([\w\.]+)\.', line)
     if dns_query:
         store_dns_info( dns_query)
-        line = re.sub( '\?\s(.*?)\.\s\(\d+\)', colorize_matches_within, line)
+        line = re.sub(r'\?\s(.*?)\.\s\(\d+\)', colorize_matches_within, line)
 
 
     """
@@ -766,39 +875,39 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 04:21:35.711426 IP 172.30.240.1.53 > 172.30.253.88.47204: 20303- 5/0/0 CNAME github.github.io., A 185.199.109.153, A 185.199.108.153, A 185.199.110.153, A 185.199.111.153 (158)
 04:32:36.555860 IP 172.30.240.1.53 > 172.30.253.88.51003: 5787- 6/0/0 A 74.6.231.21, A 74.6.143.25, A 74.6.231.20, A 98.137.11.164, A 98.137.11.163, A 74.6.143.26 (132)
     """
-    dns_response = re.search( 'IP6? (.*?.53) > .*?\.(\d+): (\d+)-? \d+\/\d+\/\d+.*? (?:A|AAAA) ([\w\.:, ]+) \(', line)
+    dns_response = re.search(r'IP6? (.*?.53) > .*?\.(\d+): (\d+)-? \d+\/\d+\/\d+.*? (?:A|AAAA) ([\w\.:, ]+) \(', line)
     if dns_response:
         match_dns_info(dns_response)
 
     # See if local addresses / broadcasters can be placed on the left
     for add in all_adds:
-        if re.search( f' > {add}(:|\.{port})', line):
+        if re.search( rf' > {add}(:|\.{port})', line):
             #print( "LOCAL on the right found")
-            line = re.sub( f'\s({proto})\s(.*) > (.*?):\s', 
-                f' \g<1> {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}>>{Style.RESET_ALL}\g<3> < \g<2>: ', line)
+            line = re.sub( rf'\s({proto})\s(.*) > (.*?):\s', 
+                rf' \g<1> {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}>>{Style.RESET_ALL}\g<3> < \g<2>: ', line)
         else:
             # Any local ones are now all on the left already
             line = re.sub( 
-                f'\s({add})(:|\.{port}) > ', 
-                f' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}>>{Style.RESET_ALL}\g<1>\g<2> > ', line)
+                rf'\s({add})(:|\.{port}) > ', 
+                rf' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}>>{Style.RESET_ALL}\g<1>\g<2> > ', line)
 
     for add in all_broadcasts:
-        if re.search( ' > ' + add + f'(:|\.{port})', line):
+        if re.search( ' > ' + add + rf'(:|\.{port})', line):
             print( "BROADCAST found")
-            line = re.sub( f'^([0-9:\.]+\s{proto})\s({ipv4_addr})(\s|:|\.)', 
-                f' \g<1> {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}(({Style.RESET_ALL}'
-                + f'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
-                + '\g<3>', line)
+            line = re.sub( rf'^([0-9:\.]+\s{proto})\s({ipv4_addr})(\s|:|\.)', 
+                rf' \g<1> {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}(({Style.RESET_ALL}'
+                + rf'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
+                + r'\g<3>', line)
 
     # Time refix reformatting, works for  pktmon & tcpdump
     #line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', '\g<1>\g<2>\g<3>.\g<4> ', line)
-    line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', colorize_timestamp, line)
+    line = re.sub( r'^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', colorize_timestamp, line)
 
     # pktmon.exe:
     """
     BSSID:80-26-89-AB-D9-84 SA:E4-A4-71-B3-75-72 DA:80-26-89-AB-D9-84 LLC, dsap SNAP (0xaa) Individual, ssap SNAP (0xaa) Command, ctrl 0x03: oui Ethernet (0x000000), ethertype IPv6 (0x86dd), length 99: 2001:e68:542c:361a:2092:bc22:2d56:3032.63292 > 2404:6800:4001:80e::200e.443: Flags [P.], seq 2226039764:2226039803, ack 1995787296, win 513, length 39
     """
-    pktmon_logline = re.search( 'PktGroupId \d+, .*? Direction (.x) , Type (.*?) ,', line)
+    pktmon_logline = re.search(r'PktGroupId \d+, .*? Direction (.x) , Type (.*?) ,', line)
     if pktmon_logline:
         #print('MARK2', pktmon_logline.group(1), pktmon_logline.group(2), 'END' )
         pktmon_prefix = re.sub( ' PktGroupId.*', '', line)
@@ -813,23 +922,18 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 
     if re.search( 'BSSID:.*?, ethertype IP', line):
         printn('WiFiPkt?:')
-        line = re.sub( f'\s+BSSID:.*?, ethertype (IPv\d) .*?: (.*)$', ' \g<1> \g<2>', line)
-        line = re.sub( ' (IPv4) ', f' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL} ', line)
-        line = re.sub( ' (IPv6) ', f' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}\g<1>{Style.RESET_ALL} ', line)
-        line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
-        line = re.sub( f'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
-        line = re.sub( f'seq (\d+):(\d+),', colorize_matches_within, line)
-        line = re.sub( f'ack (\d+),', colorize_matches_within, line)
-        line = re.sub( '(Flags )(\[R\])', f'\g<1>{Back.RED}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[S\])', f'\g<1>{Back.BLACK}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[S\.\])', f'\g<1>{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[P.\])', f'\g<1>{Back.GREEN}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[\.\])', f'\g<1>{Back.GREEN}{Style.BRIGHT}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
+        line = re.sub( rf'\s+BSSID:.*?, ethertype (IPv\d) .*?: (.*)$', r' \g<1> \g<2>', line)
+        line = re.sub( ' (IPv4) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL} ', line)
+        line = re.sub( ' (IPv6) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}\g<1>{Style.RESET_ALL} ', line)
+        line = re.sub( rf'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
+        line = re.sub( rf'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
+        line = re.sub( rf'seq (\d+):(\d+),', colorize_matches_within, line)
+        line = re.sub( rf'ack (\d+),', colorize_matches_within, line)
 
     """
 00-0C-29-07-BD-09 > FF-FF-FF-FF-FF-FF, ethertype IPv4 (0x0800), length 342: 0.0.0.0.68 > 255.255.255.255.67: UDP, length 300
     """
-    pktmon_udp_pkt = re.search('^([\d\.]+)\s+[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?: (.*: UDP, length \d+)$', line)
+    pktmon_udp_pkt = re.search(r'^([\d\.]+)\s+[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?: (.*: UDP, length \d+)$', line)
     if pktmon_udp_pkt:
         printn('UDP:')
         line = pktmon_udp_pkt.group(1) + pktmon_udp_pkt.group(2) + pktmon_udp_pkt.group(3)
@@ -840,51 +944,42 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
 00-15-5D-A4-2F-20 > 00-15-5D-0F-F3-BA, ethertype IPv4 (0x0800), length 67: 172.30.240.1.50118 > 172.30.253.88.45885: Flags [P.], seq 831973636:831973649, ack 150871422, win 8209, length 13
 130704.020      00-15-5D-A4-2F-20 > 00-15-5D-0F-F3-BA, ethertype IPv4 (0x0800), length 67: 172.30.240.1.60169 > 172.30.253.88.45885: Flags [P.], seq 1151420986:1151420999, ack 1349378398, win 8211, length 13
     """
-    pktmon_tcp_pkt = re.search('([\d\.]+)\s+[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?:( .*?Flags.*)$', line)
+    pktmon_tcp_pkt = re.search(r'([\d\.]+)\s+[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?:( .*?Flags.*)$', line)
     if pktmon_tcp_pkt:
         printn('TCP:')
         line = pktmon_tcp_pkt.group(1) + ' ' + pktmon_tcp_pkt.group(2) + pktmon_tcp_pkt.group(3)
-        line = re.sub( ' (IPv4) ', f' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL} ', line)
-        line = re.sub( ' (IPv6) ', f' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}\g<1>{Style.RESET_ALL} ', line)
-        line = re.sub( f'seq (\d+):(\d+),', colorize_matches_within, line)
-        line = re.sub( f'ack (\d+),', colorize_matches_within, line)
-        line = re.sub( '(Flags )(\[R\])', f'\g<1>{Back.RED}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[S\])', f'\g<1>{Back.BLACK}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[S\.\])', f'\g<1>{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[P.\])', f'\g<1>{Back.GREEN}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[\.\])', f'\g<1>{Back.GREEN}{Style.BRIGHT}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
+        line = re.sub( ' (IPv4) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL} ', line)
+        line = re.sub( ' (IPv6) ', rf' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}\g<1>{Style.RESET_ALL} ', line)
+        line = re.sub( rf'seq (\d+):(\d+),', colorize_matches_within, line)
+        line = re.sub( rf'ack (\d+),', colorize_matches_within, line)
         #line = re.sub('[0-9A-F]{2}-[0-9A-F]{2}.*?, ethertype (IPv\d) .*?: (.*: Flags .*  length \d+)$', '\g<1> \g<2>', line)
 
     if re.search( ' IP .*: (?:tcp |UDP,|Flags)', line):
-        line = re.sub( f'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
-        line = re.sub( '(Flags )(\[R\])', f'\g<1>{Back.RED}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[S\])', f'\g<1>{Back.BLACK}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[S\.\])', f'\g<1>{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[P.\])', f'\g<1>{Back.GREEN}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
-        line = re.sub( '(Flags )(\[\.\])', f'\g<1>{Back.GREEN}{Style.BRIGHT}{Fore.WHITE}\g<2>{Style.RESET_ALL}', line)
+        line = re.sub( rf'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
     elif re.search( ' IP6 .*: (?:tcp |UDP,|0)', line):
-        line = re.sub( f'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
+        line = re.sub( rf'({ipv6_addr})\.({port})', colorize_match_ip_port, line)
     elif re.search( ': ICMP ', line):
         line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
-        line = re.sub( '(ICMP echo request)', f'{Back.BLACK}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
-        line = re.sub( '(ICMP echo reply)', f'{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
-
-    # TODO: Check for 'Flags' and deal with them all in one place
+        line = re.sub( '(ICMP echo request)', rf'{Back.BLACK}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
+        line = re.sub( '(ICMP echo reply)', rf'{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)
 
     elif re.search( ': ICMP6 ', line):
-        line = re.sub( f'({ipv6_addr})', colorize_match_ip, line)
+        line = re.sub( f'({ipv6_addr})', colorize_match, line)
     elif re.search( ' ARP', line):
         # ARP, Request who-has 172.30.253.88 (00:15:5d:0f:f3:ba) tell 172.30.240.1, length 28
         line = re.sub( ', Request who-has (.*?) tell (.*?),', 
                  f' {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}(({Style.RESET_ALL}'
-                + f'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
-                + f' who-has \g<1>'
+                + rf'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
+                + rf' who-has \g<1>'
             , line)
         # ARP, Reply 172.30.253.88 is-at 00:15:5d:0f:f3:ba, length 28
-        line = re.sub( ', Reply (.*?) is-at (.*?),', f' \g<1> reply: \g<2>', line)
+        line = re.sub( ', Reply (.*?) is-at (.*?),', rf' \g<1> reply: \g<2>', line)
         line = re.sub( f'({ipv4_addr})', colorize_match, line)
     else:
         line = re.sub( f'({ipv4_addr})', colorize_match, line)
+
+    # Deal with all 'Flags [...]' in one place (also drops the word 'Flags' for terseness)
+    line = re.sub( r'(Flags )(\[[SFPURWE.]+\])', colorize_flags, line)
 
     # TODO: Other things to learn and figure out:
     """

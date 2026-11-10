@@ -46,14 +46,22 @@ One of my favorite tools of all time, tcpdump, has been long overdue to receivin
 (recommended: set up a virtualenv 'ctd' for the following)
 
 ```
-pip3 install colorama netifaces maxminddb_geolite2 py-radix
+pip3 install colorama netifaces py-radix
 ```
+
+If you want process identification (the `--show-pid` flag), also install:
+
+```
+pip3 install psutil
+```
+
+Process identification is enabled by default (appends `[process][pid]` tags to each line). Disable it with `--no-pids`.
 
 If you get an error installing py-radix (Debian 13 and other new and bleeding edge distros) try this:
 
 ```
 pip3 install git+https://github.com/mjschultz/py-radix.git@v1.0.0 
-pip3 install colorama netifaces maxminddb_geolite2
+pip3 install colorama netifaces
 ```
 # USAGE
 
@@ -109,7 +117,9 @@ Other examples of popular options include:
 # TODO
 
 Features
-	- Lookup system connections to see if a local - remote connection can be matched to a process, and add a short process name[PID] to the end of the line ( e.g. `firefox[1234]`), https://psutil.readthedocs.io/en/latest/#psutil.net_connections
+	- Bandwidth estimation: accumulate packet sizes and show running transfer totals (e.g. `↑1.2MB ↓4.5MB`)
+	- Port scan detection: flag single sources hitting many ports in a short window
+	- **Process identification** (default, `--no-pids` to disable): map local connections to process names via `psutil.net_connections()` ✅
 	- get rid of the './ctd' wrapper, and use the script itself with a suitable system call instead like a grown up
 	- Tag everything based on ASN?
 	- Use a more optimized IP lookup module, namely ___

@@ -373,7 +373,7 @@ ipv6_addr = r'(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:
 
 proto = '[A-Z]{1,8}' # is 8 enough?
 
-from geolite2 import geolite2
+from data.ip2asn_lookup import geolite2
 reader = geolite2.reader()
 
 """
@@ -604,8 +604,11 @@ def get_ip_info( ip):
         else:
             info += crc_colorize( '??')
 
-        if 'subdivisions' in geoip:
-            info += '/' + crc_colorize(geoip['subdivisions'][0]['iso_code'])
+        # Add ASN info if available (ip2asn-combined.tsv provides this)
+        if 'name' in geoip and geoip['name']:
+            # Truncate ASN name to 6 chars
+            asn_name = geoip['name'][:6]
+            info += '/' + crc_colorize(asn_name)
 
     if info != "":
         info = f'[{info}]'

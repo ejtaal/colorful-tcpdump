@@ -271,9 +271,15 @@ def show_logo():
 
     print( colored_logo)
     print()
-    # Colorize URL parts differently, like the logo
+    # Colorize URL parts semantically: scheme, ://, domain, user, repo
     link = 'GitHub: https://github.com/ejtaal/colorful-tcpdump'
-    link = re.sub( r'([^\s]{1,6})', colorize_match, link)
+    def color_url_part(m):
+        return crc_colorize(m.group(0))
+    link = re.sub(r'https', color_url_part, link)          # scheme
+    link = re.sub(r'://', color_url_part, link)            # separator
+    link = re.sub(r'github\.com', color_url_part, link)    # domain
+    link = re.sub(r'ejtaal', color_url_part, link)         # username
+    link = re.sub(r'colorful-tcpdump', color_url_part, link)  # repo
     print( link)
 
 import argparse

@@ -1014,6 +1014,40 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
         line = re.sub( rf'({ipv4_addr})\.({port})', colorize_match_ip_port, line)
     elif re.search( ' IP6 .*: (?:tcp |UDP,|Flags|0)', line):
         line = re.sub( rf'({ipv6_addr})\.({port})', colorize_match_ip6_port, line)
+    # Traceroute detection and annotation
+    if re.search( r'^\s*traceroute', line):
+        # Header line: 'traceroute to host (IP), hops max, packets'
+        def colorize_traceroute_header_ip(m):
+            # Re-wrap the match object so group(1) is the IP
+            class FakeMatch:
+                def __init__(self, ip):
+                    self._ip = ip
+                def group(self, n):
+                    return self._ip
+            return m.group(1) + colorize_match_ip(FakeMatch(m.group(2)))
+        line = re.sub(
+            rf'(traceroute to \S+ )\(?({ipv4_addr})\)?',
+            colorize_traceroute_header_ip,
+            line
+        )
+    elif re.search( r'^\s*\d+\s+\S+\s*\(', line):
+        # Hop line: ' N  HOSTNAME (IP)  TIME ms' or ' N  IP (IP)  TIME ms'
+        def colorize_traceroute_hop_ip(m):
+            class FakeMatch:
+                def __init__(self, ip):
+                    self._ip = ip
+                def group(self, n):
+                    return self._ip
+            # m.group(1) = hop number + whitespace + hostname
+            # m.group(2) = opening paren
+            # m.group(3) = IP
+            # m.group(4) = closing paren + whitespace
+            return m.group(1) + m.group(2) + colorize_match_ip(FakeMatch(m.group(3))) + m.group(4)
+        line = re.sub(
+            rf'(\d+\s+\S+\s*)(\()?({ipv4_addr})(\)?)',
+            colorize_traceroute_hop_ip,
+            line
+        )
     elif re.search( ': ICMP ', line):
         line = re.sub( f'({ipv4_addr})', colorize_match_ip, line)
         line = re.sub( '(ICMP echo request)', rf'{Back.BLACK}{Fore.GREEN}\g<1>{Style.RESET_ALL}', line)

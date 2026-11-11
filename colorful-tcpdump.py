@@ -271,7 +271,10 @@ def show_logo():
 
     print( colored_logo)
     print()
-    print( crc_colorize('GitHub: https://github.com/ejtaal/colorful-tcpdump'))
+    # Colorize URL parts differently, like the logo
+    link = 'GitHub: https://github.com/ejtaal/colorful-tcpdump'
+    link = re.sub( r'([^\s]{1,6})', colorize_match, link)
+    print( link)
 
 import argparse
 parser = argparse.ArgumentParser( description='A script to prettify tcpdump output with colours, add extra info regarding IPs seen, and add some other enhancements to the output.')

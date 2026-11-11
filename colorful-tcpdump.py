@@ -604,6 +604,20 @@ def get_ip_info( ip):
         else:
             info += crc_colorize( '??')
 
+        # Add subdivision (state/region) if available
+        if 'subdivision' in geoip and geoip['subdivision']:
+            info += '/' + crc_colorize(geoip['subdivision'][:10])
+
+        # Add city if available
+        if 'city' in geoip and geoip['city']:
+            city = geoip['city']
+            if isinstance(city, dict):
+                city_name = city.get('names', {}).get('en', '')
+            else:
+                city_name = str(city)
+            if city_name:
+                info += '/' + crc_colorize(city_name[:15])
+
         # Add ASN info if available (ip2asn-combined.tsv provides this)
         if 'name' in geoip and geoip['name']:
             # Truncate ASN name to 6 chars

@@ -46,7 +46,7 @@ One of my favorite tools of all time, tcpdump, has been long overdue to receivin
 (recommended: set up a virtualenv 'ctd' for the following)
 
 ```
-pip3 install colorama netifaces py-radix
+pip3 install colorama netifaces py-radix maxminddb
 ```
 
 If you want process identification (the `--show-pid` flag), also install:
@@ -63,6 +63,22 @@ If you get an error installing py-radix (Debian 13 and other new and bleeding ed
 pip3 install git+https://github.com/mjschultz/py-radix.git@v1.0.0 
 pip3 install colorama netifaces
 ```
+
+# CITY-LEVEL IP INFO (optional)
+
+The bundled ip2asn-combined.tsv only provides country and ASN level information.
+For city granularity, download DB-IP's free City Lite database (IP geolocation
+data by DB-IP, https://db-ip.com, licensed under CC BY 4.0):
+
+```
+./data/dbip-city.sh
+```
+
+This fetches a monthly `dbip-city-lite-*.mmdb` into data/, which is picked up
+automatically (gzipped copies are unpacked on first use). Alternatively, drop a
+GeoLite2-City mmdb into data/ if you have one - the newest file wins. Without
+either, city lookups are silently skipped.
+
 # USAGE
 
 Make sure the python modules are installed, or you are in your nominated virtualenv python environment.

@@ -1024,8 +1024,10 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
                 + rf' who-has \g<1>'
             , line)
         # ARP, Reply 172.30.253.88 is-at 00:15:5d:0f:f3:ba, length 28
-        line = re.sub( ', Reply (.*?) is-at (.*?),', rf' \g<1> reply: \g<2>', line)
-        line = re.sub( f'({ipv4_addr})', colorize_match, line)
+        # Color ARP reply similarly to ICMP reply (bright green on black bg)
+        arp_reply_style = Back.BLACK + Style.BRIGHT + Fore.GREEN
+        line = re.sub( rf', Reply ({ipv4_addr}) is-at (.*?),',
+                 rf' {arp_reply_style}(\1{arp_reply_style}){Style.RESET_ALL} reply: \2', line)
     else:
         line = re.sub( f'({ipv4_addr})', colorize_match, line)
 

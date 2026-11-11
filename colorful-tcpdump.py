@@ -226,7 +226,7 @@ def crc_colorize( s):
     if nocolor:
       return( s)
     else:
-      crc = binascii.crc_hqx( s.encode('ascii'), 0)
+      crc = binascii.crc_hqx( s.encode('utf-8', errors='replace'), 0)
       #print( s, crc, crc % nice_colors_num)
       #return( nice_colors[ crc % nice_colors_num] + s + Style.RESET_ALL)
       return( rgb_ansi( nice_colors[ crc % nice_colors_num]) + s + Style.RESET_ALL)
@@ -264,23 +264,44 @@ def gen_random_logo_strings( o):
     return random.choice( tcpdump_logo_strings[ len( o.group(0))])
 
 def show_logo():
-    colored_logo = ctd_logo
-    
-    colored_logo = re.sub( r'([^\s]{1,6})', gen_random_logo_strings, colored_logo)
-    colored_logo = re.sub( r'([^\s]{1,6})', colorize_match, colored_logo)
-
-    print( colored_logo)
-    print()
-    # Colorize URL parts semantically: scheme, ://, domain, user, repo
-    link = 'GitHub: https://github.com/ejtaal/colorful-tcpdump'
+    # Colorize URL parts semantically: GH, ': ', https, '://', domain, user, repo.
+    # The whole thing is wrapped in plain [[[ ]]] so it stands out from the
+    # surrounding pattern.
+    url_banner = '[[[ GH: https://github.com/ejtaal/colorful-tcpdump ]]]'
     def color_url_part(m):
         return crc_colorize(m.group(0))
-    link = re.sub(r'https', color_url_part, link)          # scheme
-    link = re.sub(r'://', color_url_part, link)            # separator
-    link = re.sub(r'github\.com', color_url_part, link)    # domain
-    link = re.sub(r'ejtaal', color_url_part, link)         # username
-    link = re.sub(r'colorful-tcpdump', color_url_part, link)  # repo
-    print( link)
+    banner_colored = re.sub(r'(GH|: |https|://|github\.com|ejtaal|colorful-tcpdump)',
+                            color_url_part, url_banner)
+
+    def color_logo_text(text):
+        colored_text = re.sub(r'([^\s]{1,6})', gen_random_logo_strings, text)
+        return re.sub(r'([^\s]{1,6})', colorize_match, colored_text)
+
+    # Find the last non-empty line (the bottom hash pattern)
+    lines = ctd_logo.split('\n')
+    last_idx = len(lines) - 1
+    while last_idx >= 0 and not lines[last_idx].strip():
+        last_idx -= 1
+
+    colored_lines = []
+    for i, line in enumerate(lines):
+        if i == last_idx and len(line) >= len(url_banner) + 2:
+            # Embed the URL banner within the bottom line, centered. Widen the
+            # hole until its edges are whitespace so the banner never glues
+            # onto neighbouring substituted pattern chunks.
+            start = (len(line) - len(url_banner)) // 2
+            while start > 0 and line[start - 1] != ' ':
+                start -= 1
+            end = start + len(url_banner)
+            while end < len(line) and line[end] != ' ':
+                end += 1
+            colored_lines.append(color_logo_text(line[:start])
+                                 + banner_colored
+                                 + color_logo_text(line[end:]))
+        else:
+            colored_lines.append(color_logo_text(line))
+
+    print('\n'.join(colored_lines))
 
 import argparse
 parser = argparse.ArgumentParser( description='A script to prettify tcpdump output with colours, add extra info regarding IPs seen, and add some other enhancements to the output.')
@@ -1072,11 +1093,12 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
                 + rf'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
                 + rf' who-has \g<1>'
             , line)
-        # ARP, Reply 172.30.253.88 is-at 00:15:5d:0f:f3:ba, length 28
-        # Color ARP reply similarly to ICMP reply (bright green on black bg)
-        arp_reply_style = Back.BLACK + Style.BRIGHT + Fore.GREEN
-        line = re.sub( rf', Reply ({ipv4_addr}) is-at (.*?),',
-                 rf' {arp_reply_style}(\1{arp_reply_style}){Style.RESET_ALL} reply: \2', line)
+        # Color all IPs in ARP lines with their CRC colors (no info - local traffic)
+        def colorize_arp_ip(m):
+            return crc_colorize(m.group(1))
+        line = re.sub( rf'({ipv4_addr})', colorize_arp_ip, line)
+        # Color "Reply" green
+        line = re.sub( r'\b(Reply)\b', Back.BLACK + Style.BRIGHT + Fore.GREEN + r'\g<1>' + Style.RESET_ALL, line)
     else:
         line = re.sub( f'({ipv4_addr})', colorize_match, line)
 

@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
 """
-ip2asn_lookup.py - A GeoIP/ASN lookup module based on ip2asn-combined.tsv + a city mmdb
+ip2asn_lookup.py - A GeoIP/ASN lookup module based on ip2asn-combined.tsv + DB-IP City Lite
 
 This module replaces the deprecated maxminddb_geolite2 (geomind) module with
 a combination of:
 - ip2asn-combined.tsv for ASN and country data
-- A city mmdb for city/subdivision data. Either DB-IP City Lite
-  (free, CC BY 4.0, download with data/dbip-city.sh) or MaxMind's
-  GeoLite2-City (free with a MaxMind account, license forbids redistribution).
+- DB-IP's City Lite mmdb (free, CC BY 4.0, download with data/dbip-city.sh)
+  for city/subdivision data
 
 Usage:
-    from ip2asn_lookup import geolite2
-    reader = geolite2.reader()
+    from ip2asn_lookup import ip2asn
+    reader = ip2asn.reader()
     result = reader.get('1.1.1.1')
     print(result)
     reader.close()
-
-The API is compatible with maxminddb_geolite2's geolite2 module.
 """
 
 import ipaddress
@@ -29,8 +26,8 @@ import re
 import sys
 
 
-class _GeoLite2Reader:
-    """Reader for ip2asn-combined.tsv + GeoLite2 City data using radix trees for fast lookups."""
+class _IP2ASNReader:
+    """Reader for ip2asn-combined.tsv + DB-IP City Lite data using radix trees for fast lookups."""
 
     def __init__(self, data_dir=None):
         """Initialize the reader by loading and indexing the data files.
@@ -60,15 +57,13 @@ class _GeoLite2Reader:
         self._city_reader = self._open_city_mmdb(data_dir)
 
     def _open_city_mmdb(self, data_dir):
-        """Open the newest city mmdb found next to the other data files.
+        """Open the newest DB-IP City Lite mmdb found next to the other data files.
 
         Supported files (newest mtime wins):
-            dbip-city-lite-<date>.mmdb / .mmdb.gz  (DB-IP City Lite, data/dbip-city.sh)
-            GeoLite2-City.mmdb / GeoLite2-City-<date>.mmdb / .mmdb.gz  (MaxMind)
+            dbip-city-lite-<date>.mmdb / .mmdb.gz  (data/dbip-city.sh)
         A bundled .mmdb.gz is decompressed once, to .mmdb, on first use.
         """
-        mmdb_files = glob.glob(os.path.join(data_dir, 'dbip-city-lite-*.mmdb*')) + \
-                     glob.glob(os.path.join(data_dir, 'GeoLite2-City*.mmdb*'))
+        mmdb_files = glob.glob(os.path.join(data_dir, 'dbip-city-lite-*.mmdb*'))
         if not mmdb_files:
             print("No city mmdb found (city lookups disabled; run data/dbip-city.sh to get one)",
                   file=sys.stderr)
@@ -159,7 +154,7 @@ class _GeoLite2Reader:
         return prefix_len
     
     def _get_city_info(self, ip):
-        """Get city/subdivision info from GeoLite2 City database."""
+        """Get city/subdivision info from the DB-IP City Lite database."""
         if not self._city_reader:
             return None
         
@@ -198,8 +193,7 @@ class _GeoLite2Reader:
             ip: IP address string to look up
             
         Returns:
-            Dictionary with country, city, subdivision, and ASN info.
-            Format compatible with maxminddb_geolite2:
+            Dictionary with country, city, subdivision, and ASN info:
             {
                 'country': {'iso_code': 'US'},
                 'subdivisions': [{'iso_code': 'CA'}],
@@ -264,7 +258,7 @@ class geolite2:
     def reader(cls):
         """Get or create the reader instance."""
         if cls._reader is None:
-            cls._reader = _GeoLite2Reader()
+            cls._reader = _IP2ASNReader()
         return cls._reader
     
     @classmethod

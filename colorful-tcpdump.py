@@ -378,8 +378,8 @@ ipv6_addr = r'(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:
 
 proto = '[A-Z]{1,8}' # is 8 enough?
 
-from data.ip2asn_lookup import ip2asn
-reader = ip2asn.reader()
+from data.ip2asn_lookup import geolite2
+reader = geolite2.reader()
 
 """
 >>> from data.ip2asn_lookup import ip2asn

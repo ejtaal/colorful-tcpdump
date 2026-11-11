@@ -16,10 +16,16 @@ URL="https://iptoasn.com/data/ip2asn-combined.tsv.gz"
 ls -l "$SOURCE" > "${SOURCE}.txt"
 
 # wget -O "$SOURCE" "$URL"
-MAX_CACHE_AGE=$((7*24*60))
+MAX_CACHE_AGE=$((31*24*60))
 download_if_not_older "$SOURCE" "$MAX_CACHE_AGE" "$URL"
 
 TEMPFILE="/tmp/asn-parse.XXX"
+
+if ! which ipcalc; then
+	echo "command 'ipcalc' not found. Fix please."
+	exit 1
+fi
+	
 
 extract_asn() {
 	> "$TEMPFILE"
@@ -82,6 +88,16 @@ extract_asn UUNET "UUNET"
 extract_asn CERNET "CERNET"
 extract_asn ALIBABA "(ALIBABA|Alibaba.com)"
 extract_asn AKAMAI "AKAMAI"
+
+# TODO: Add below when implemented
+# extract_asn CHINANET "(CHINANET|ChinaNet)"
+# AS4808 - #4 most common ASN in traffic
+# extract_asn CHINAMOBILE "CHINAMOBILE"
+# AS9808 - #6 most common ASN in traffic
+# extract_asn DIGITALOCEAN "DIGITALOCEAN"
+# AS14061 - growing cloud provider
+# extract_asn HETZNER "HETZNER"
+# AS24940 - popular European hosting provider
 
 ls -l "$OUTPUT"
 head -3 "$OUTPUT"

@@ -19,11 +19,42 @@ Usage:
 import ipaddress
 import glob
 import gzip
-import radix
-import maxminddb
+import json
 import os
 import re
 import sys
+import time
+import threading
+
+import radix
+import maxminddb
+
+
+# Spinner animation for loading progress
+spinner_frames = ['\u2814', '\u2818', '\u2819', '\u281C', '\u2824', '\u282C', '\u2836', '\u2837', '\u2837', '\u283F']
+spinner_idx = 0
+loading_stage = ["Loading ASN data..."]
+
+def _set_loading_stage(stage):
+    """Set the current loading stage text."""
+    loading_stage[0] = stage
+
+def _format_progress(percent):
+    """Format a progress bar based on percentage."""
+    width = 40
+    filled = int(width * percent / 100)
+    bar = '█' * filled + '░' * (width - filled)
+    return f' [{bar}] {percent:3.0f}%'
+
+
+def _show_spinner_step(progress=0):
+    """Show a single spinner frame with progress bar."""
+    global spinner_idx
+    progress_str = _format_progress(progress)
+    sys.stderr.write('\r' + spinner_frames[spinner_idx % len(spinner_frames)] + ' ' + loading_stage[0] + progress_str)
+    sys.stderr.flush()
+    spinner_idx += 1
+    time.sleep(0.05)
 
 
 class _IP2ASNReader:
@@ -88,18 +119,77 @@ class _IP2ASNReader:
                 chosen = unpacked
 
         try:
+            # Set loading stage
+            _set_loading_stage("Loading city database...")
+            
+            # Smooth transition from 45% to 60%
+            for pct in range(45, 61, 2):
+                _show_spinner_step(pct)
+            
+            # Show city loading progress (60-85%)
+            _show_spinner_step(70)
             reader = maxminddb.open_database(chosen)
+            
+            # Smooth transition from 85% to 100%
+            for pct in range(85, 101, 2):
+                _show_spinner_step(pct)
+            
+            # Clear spinner before showing final message
+            sys.stderr.write('\r' + ' ' * 80 + '\r')
+            sys.stderr.flush()
             print(f"Loaded city data from {chosen}", file=sys.stderr)
             return reader
         except Exception as e:
+            sys.stderr.write('\r' + ' ' * 80 + '\r')
+            sys.stderr.flush()
             print(f"Warning: Could not load city database {chosen}: {e}", file=sys.stderr)
             return None
     
     def _load_asn_data(self, tsv_path):
-        """Load ASN/country data from TSV and build radix tree."""
+        """Load ASN/country data from TSV or preprocessed JSON, and build radix tree."""
+        # Set loading stage
+        _set_loading_stage("Loading ASN data...")
+        
+        # Try to load from preprocessed JSON first
+        json_path = os.path.join(self._data_dir, 'ip2asn-ctd-data.json')
+        if os.path.exists(json_path):
+            count = self._load_asn_from_json(json_path)
+        else:
+            count = self._load_asn_from_tsv(tsv_path)
+        
+        # Show 45% complete for ASN loading
+        _show_spinner_step(45)
+        
+        # Clear spinner before showing final message
+        sys.stderr.write('\r' + ' ' * 80 + '\r')
+        sys.stderr.flush()
+        print(f"Loaded {count} ASN ranges", file=sys.stderr)
+    
+    def _load_asn_from_tsv(self, tsv_path):
+        """Load ASN/country data from TSV and build radix tree. Returns count."""
         count = 0
+        lines_processed = 0
+        
+        # Count total lines for progress
+        try:
+            with open(tsv_path, 'r') as f:
+                total_lines = sum(1 for _ in f)
+        except:
+            total_lines = None
+        
+        # Show spinner while loading
         with open(tsv_path, 'r') as f:
             for line in f:
+                lines_processed += 1
+                
+                # Update progress every 20000 lines
+                if lines_processed % 20000 == 0 or total_lines is None:
+                    if total_lines and total_lines > 0:
+                        progress = (lines_processed / total_lines) * 45
+                    else:
+                        progress = min(45, lines_processed / 10000)
+                    _show_spinner_step(progress)
+                
                 line = line.strip()
                 if not line:
                     continue
@@ -108,7 +198,8 @@ class _IP2ASNReader:
                 if len(parts) < 5:
                     continue
                 
-                start_ip_str, end_ip_str, asn_str, country_code, asn_name = parts[0], parts[1], parts[2], parts[3], parts[4]
+                start_ip_str, end_ip_str, asn_str, country_code, asn_name = \
+                    parts[0], parts[1], parts[2], parts[3], parts[4]
                 
                 try:
                     start_ip = ipaddress.ip_address(start_ip_str)
@@ -138,7 +229,39 @@ class _IP2ASNReader:
                 except (ValueError, IndexError):
                     continue
         
-        print(f"Loaded {count} ASN ranges from {tsv_path}", file=sys.stderr)
+        return count
+    
+    def _load_asn_from_json(self, json_path):
+        """Load ASN/country data from preprocessed JSON and build radix tree. Returns count."""
+        count = 0
+        
+        # Show spinner while loading
+        _show_spinner_step(10)
+        
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+        
+        _show_spinner_step(30)
+        
+        # Build radix tree from JSON data
+        for key, entry in data.get('data', {}).items():
+            asn = entry.get('asn', 0)
+            country = entry.get('country')
+            name = entry.get('name')
+            
+            for cidr in entry.get('ranges', []):
+                try:
+                    network = ipaddress.ip_network(cidr, strict=False)
+                    node = self._asn_tree.add(str(network))
+                    node.data['country_code'] = country
+                    node.data['asn'] = asn
+                    node.data['asn_name'] = name
+                except ValueError:
+                    continue
+            count += 1
+        
+        _show_spinner_step(45)
+        return count
     
     def _common_prefix_bits(self, start_ip, end_ip):
         """Calculate the number of common prefix bits between two IP addresses."""

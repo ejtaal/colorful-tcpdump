@@ -1,6 +1,5 @@
 PktMon.etl
 .*.swp
 data/ip2asn-combined.tsv.gz
-data/GeoLite2-City*.mmdb
 data/dbip-city-lite-*.mmdb
 data/dbip-city-lite-*.mmdb.gz

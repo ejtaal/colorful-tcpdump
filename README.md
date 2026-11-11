@@ -75,9 +75,8 @@ data by DB-IP, https://db-ip.com, licensed under CC BY 4.0):
 ```
 
 This fetches a monthly `dbip-city-lite-*.mmdb` into data/, which is picked up
-automatically (gzipped copies are unpacked on first use). Alternatively, drop a
-GeoLite2-City mmdb into data/ if you have one - the newest file wins. Without
-either, city lookups are silently skipped.
+automatically (gzipped copies are unpacked on first use). Without it, city
+lookups are silently skipped.
 
 # USAGE
 

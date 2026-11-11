@@ -388,13 +388,13 @@ from data.ip2asn_lookup import geolite2
 reader = geolite2.reader()
 
 """
->>> from data.ip2asn_lookup import ip2asn
+>>> from data.ip2asn_lookup import geolite2
 >>>
->>> reader = ip2asn.reader()
+>>> reader = geolite2.reader()
 >>> reader.get('1.1.1.1')
 {'country': ... }
 >>>
->>> ip2asn.close()
+>>> geolite2.close()
 #pprint(vars(object))
 """
 

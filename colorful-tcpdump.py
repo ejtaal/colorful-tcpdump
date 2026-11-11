@@ -270,6 +270,8 @@ def show_logo():
     colored_logo = re.sub( r'([^\s]{1,6})', colorize_match, colored_logo)
 
     print( colored_logo)
+    print()
+    print( crc_colorize('GitHub: https://github.com/ejtaal/colorful-tcpdump'))
 
 import argparse
 parser = argparse.ArgumentParser( description='A script to prettify tcpdump output with colours, add extra info regarding IPs seen, and add some other enhancements to the output.')

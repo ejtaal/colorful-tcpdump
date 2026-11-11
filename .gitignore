@@ -1,5 +1,7 @@
 PktMon.etl
 .*.swp
+__pycache__/
+*.bak
 data/ip2asn-combined.tsv.gz
 data/dbip-city-lite-*.mmdb
 data/dbip-city-lite-*.mmdb.gz

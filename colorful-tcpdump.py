@@ -668,7 +668,11 @@ def get_ip_info( ip):
                 #else:
                 #    print('i NOT in seen?')
                 if i not in seen and i != "":
-                    addinfo += '/' + crc_colorize( i)
+                    # Display RFC1918 as LAN
+                    if descr == 'RFC1918':
+                        addinfo = crc_colorize('LAN')
+                    else:
+                        addinfo += '/' + crc_colorize( i)
                     #print( 'addinfo: ', addinfo)
                 seen += [i]
             info += f'[{addinfo}]'

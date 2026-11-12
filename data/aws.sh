@@ -9,7 +9,7 @@ URL="https://ip-ranges.amazonaws.com/ip-ranges.json"
 TEMPFILE="/tmp/aws-parse.XXX"
 
 #wget -O "$SOURCE" https://ip-ranges.amazonaws.com/ip-ranges.json
-MAX_CACHE_AGE=$((7*24*60))
+MAX_CACHE_AGE=$((31*24*60))
 download_if_not_older "$SOURCE" "$MAX_CACHE_AGE" "$URL"
 
 echo -e '\t"AWS": [' > "$OUTPUT"

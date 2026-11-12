@@ -63,6 +63,14 @@ extract_asn() {
 		while( (getline t < ARGV[1]) > 0)last++;close(ARGV[1])}
 		{print "\t[" $0 "]", ((last==FNR) ? "\n\t]\n" :",")}' "$TEMPFILE" \
 		| cat >> "$OUTPUT"
+
+	# Empty result: the awk above prints nothing, so close the array
+	# ourselves. Otherwise the section stays as '"tag": [' and the
+	# whole JSON file becomes invalid.
+	if [ ! -s "$TEMPFILE" ]; then
+		echo -e "\t]" >> "$OUTPUT"
+		echo "$tag: no ranges found"
+	fi
 	echo 'done'
 }
 
@@ -78,7 +86,7 @@ zcat ip2asn-combined.tsv.gz \
 
 head -20 "$FREQ_REPORT"
 
-extract_asn OVH 'OVH$'
+extract_asn OVH '(OVH|OVH OVH SAS)$'
 extract_asn ONEWEB "ONEWEB"
 extract_asn SPACEX "SPACEX-STARLINK"
 extract_asn MOZILLA "MOZILLA"

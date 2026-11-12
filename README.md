@@ -75,8 +75,16 @@ data by DB-IP, https://db-ip.com, licensed under CC BY 4.0):
 ```
 
 This fetches a monthly `dbip-city-lite-*.mmdb` into data/, which is picked up
-automatically (gzipped copies are unpacked on first use). Without it, city
-lookups are silently skipped.
+automatically (gzipped copies are unpacked on first use).
+
+City data is also available pre-parsed as `data/dbip-city-ctd-data.bin.gz`
+(generated from the mmdb with `data/dbip-city-parse.py`; attribution: IP
+geolocation data by DB-IP, https://db-ip.com, CC BY 4.0, modified). It is a
+compact binary subset of the original database, is committed to this
+repository, and hardly changes between monthly mmdb releases. The loader
+prefers a local mmdb when present and falls back to this file otherwise,
+so with the repo checked out city lookups work out of the box and no
+download is needed.
 
 # USAGE
 

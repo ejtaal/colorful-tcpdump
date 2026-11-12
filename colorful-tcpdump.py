@@ -340,6 +340,7 @@ pids_enabled = not args.no_pids
 
 all_adds = []
 all_broadcasts = []
+local_nets = []   # ipaddress networks of connected subnets (any interface)
 
 
 if debug:
@@ -347,21 +348,34 @@ if debug:
 if args.myip_override:
     all_adds = args.myip_override.split(',')
 else:
+    import ipaddress
     from netifaces import *
     # TODO: detect running on windows and detect IPs there the right way(tm)
     for ifaceName in interfaces():
         #all_ifs.append( ifaddresses(ifaceName))
         for key, value in ifaddresses(ifaceName).items():
             #print(key, '->', value)
-            pass  # all_ifs removed; no longer used
-            if 'addr' in value[0]:
-                #print( 'addr', value[0]['addr'])
-                if value[0]['addr'] not in all_adds:
-                    all_adds.append( value[0]['addr'])
-            if 'broadcast' in value[0]:
-                #print( 'broadcast', value[0]['broadcast'])
-                if value[0]['broadcast'] not in all_broadcasts:
-                    all_broadcasts.append( value[0]['broadcast'])
+            for entry in value:  # an interface can have several addresses per family
+                #print( 'entry', entry)
+                if 'addr' in entry:
+                    #print( 'addr', entry['addr'])
+                    if entry['addr'] not in all_adds:
+                        all_adds.append( entry['addr'])
+                if 'netmask' in entry and 'addr' in entry:
+                    # Record the connected subnet, so LAN addresses can get a single > mark
+                    try:
+                        addr = entry['addr'].split('%')[0]  # strip IPv6 scope id
+                        netmask = entry['netmask']
+                        # Some netifaces versions return IPv6 netmasks as 'ffff::/64'
+                        if '/' in netmask:
+                            netmask = int( netmask.split('/')[1])
+                        local_nets.append( ipaddress.ip_network( (addr, netmask), strict=False))
+                    except ValueError:
+                        pass
+                if 'broadcast' in entry:
+                    #print( 'broadcast', entry['broadcast'])
+                    if entry['broadcast'] not in all_broadcasts:
+                        all_broadcasts.append( entry['broadcast'])
 
 
 if debug:
@@ -373,6 +387,11 @@ if debug:
     print( 'Local broadcast addresses:')
     for b in all_broadcasts:
         print( crc_colorize( b) + ' ', end='')
+    print('')
+
+    print( 'Connected subnets (single > mark for addresses within):')
+    for n in local_nets:
+        print( crc_colorize( str(n)) + ' ', end='')
     print('')
 
 
@@ -615,6 +634,19 @@ def _extract_source_addr(line):
 # Ze great IP info cache
 info_cache={}
 
+# Bracket colours tell the data's provenance apart at a glance, matching
+# the v4-warm / v6-cool convention used elsewhere:
+#   cool steel blue = pure ASN/geo lookup data (ip2asn + DB-IP city)
+#   warm tan        = curated range tags merged from data/*-ctd-data.json
+ASN_BRACKET_COLOR = (100, 140, 190, 2)   # cool
+TAG_BRACKET_COLOR = (170, 140, 90, 2)    # warm
+
+def colored_bracket( s, color_tuple):
+    """Wrap already-colorized info in brackets of a fixed provenance color."""
+    if nocolor:
+        return f'[{s}]'
+    return rgb_ansi( color_tuple) + '[' + s + ']' + Style.RESET_ALL
+
 def get_ip_info( ip):
 
     info = ''
@@ -657,7 +689,7 @@ def get_ip_info( ip):
             info += '/' + crc_colorize(asn_name)
 
     if info != "":
-        info = f'[{info}]'
+        info = colored_bracket( info, ASN_BRACKET_COLOR)
 
     # # Covered search will return all prefixes inside the given
     # # search term, as a list (including the search term itself,
@@ -707,7 +739,7 @@ def get_ip_info( ip):
                         addinfo += '/' + crc_colorize( i)
                     #print( 'addinfo: ', addinfo)
                 seen += [i]
-            info += f'[{addinfo}]'
+            info += colored_bracket( addinfo, TAG_BRACKET_COLOR)
 
         # print( 'info: ', info)
         # exit(8)
@@ -898,6 +930,8 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
             else:
                 local_net = ipaddress.IPv4Network( ip_addr_ip_local.group(1) + '/' + ip_addr_ip_local.group(2), False)
             all_adds.append( str(local_net.broadcast_address))
+            if local_net not in local_nets:
+                local_nets.append( local_net)
             # print('Broadcast:', local_net.broadcast_address)
         if ip_addr_link_or_ip_brd:
             # print('IP ADDR BRD:', ip_addr_link_or_ip_brd.group(1))
@@ -981,6 +1015,24 @@ def prettify_tcpdump_line_so_it_looks_nice( line):
                 rf' \g<1> {Back.BLACK}{Style.BRIGHT}{Fore.YELLOW}(({Style.RESET_ALL}'
                 + rf'\g<2>{Back.BLACK}{Style.BRIGHT}{Fore.YELLOW})){Style.RESET_ALL}'
                 + r'\g<3>', line)
+
+    # Single mark for connected-LAN addresses: not owned by us,
+    # but within the subnet of any of our interfaces
+    if local_nets:
+        def _lan_mark( m):
+            s = m.group(0)
+            if s in all_adds:
+                return s  # owned, already gets >>
+            try:
+                ip = ipaddress.ip_address( s.split('%')[0])
+            except ValueError:
+                return s
+            for net in local_nets:
+                if ip in net:
+                    return f'{Back.BLACK}{Style.BRIGHT}{Fore.GREEN}>{Style.RESET_ALL}' + s
+            return s
+        line = re.sub( ipv4_addr, _lan_mark, line)
+        line = re.sub( ipv6_addr, _lan_mark, line)
 
     # Time refix reformatting, works for  pktmon & tcpdump
     #line = re.sub( '^(\d{2}):(\d{2}):(\d{2})\.(\d{3})\d+\s', '\g<1>\g<2>\g<3>.\g<4> ', line)

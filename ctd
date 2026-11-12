@@ -5,6 +5,51 @@
 MYDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 CTD_OPTS=""
 
+# Easter egg: when running inside tmux, announce ctd in the window title 🌈
+if [ -n "$TMUX_PANE" ]; then
+	# First 10 characters of the command, with an ellipsis if truncated:
+	cmd="$*"
+	if [ ${#cmd} -gt 10 ]; then
+		cmd="${cmd:0:10}…"
+	fi
+	msg="📡🌈 ctd"
+	[ -n "$cmd" ] && msg="📡🌈 ctd $cmd"
+
+	# Rename the tmux window so it's visible in the status bar,
+	# even when viewing a different window. Restored on exit.
+	if [ -n "$TMUX" ] && command -v tmux > /dev/null; then
+		old_wname="$(tmux display-message -p -t "$TMUX_PANE" '#W' 2> /dev/null)"
+		tmux set-window-option -t "$TMUX_PANE" automatic-rename off 2> /dev/null
+		tmux rename-window -t "$TMUX_PANE" "$msg" 2> /dev/null
+		restore_wname() {
+			tmux rename-window -t "$TMUX_PANE" "$old_wname" 2> /dev/null
+			tmux set-window-option -t "$TMUX_PANE" automatic-rename on 2> /dev/null
+		}
+		trap restore_wname EXIT
+	fi
+
+	# Set the tmux pane title too (plain text; titles don't render colours).
+	# Note: only visible with `pane-border-status` or `set-titles on`.
+	if [ -t 2 ]; then
+		printf '\033]2;%s\007' "$msg" >&2
+		# Rainbow-colour the "ctd <command>" announcement on stderr (stdout
+		# feeds the pipeline); the 📡🌈 prefix stays uncoloured:
+		printf '%s' "${msg:0:2}" >&2
+		n=${#msg}
+		for (( i=2; i<n; i++ )); do
+			h=$(( 300 * (i - 2) / (n - 3) ))  # hue 0..300, red -> magenta rainbow
+			if   (( h <  60 )); then r=255;                          g=$(( h * 255 / 60 ));        b=0
+			elif (( h < 120 )); then r=$(( (120 - h) * 255 / 60 ));   g=255;                        b=0
+			elif (( h < 180 )); then r=0;                            g=255;                        b=$(( (h - 120) * 255 / 60 ))
+			elif (( h < 240 )); then r=0;                            g=$(( (240 - h) * 255 / 60 )); b=255
+			else                     r=$(( (h - 240) * 255 / 60 ));   g=0;                          b=255
+			fi
+			printf '\033[38;2;%d;%d;%dm%s' "$r" "$g" "$b" "${msg:i:1}" >&2
+		done
+		printf '\033[0m\n' >&2
+	fi
+fi
+
 #SRC_CMD=""
 
 for o in "$@"; do
